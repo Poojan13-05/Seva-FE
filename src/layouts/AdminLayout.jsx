@@ -8,7 +8,7 @@ const AdminLayout = ({ adminData, onLogout }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen geometric-texture-bg">
       {/* Sidebar */}
       <AdminSidebar 
         adminData={adminData} 

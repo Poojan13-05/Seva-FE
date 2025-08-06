@@ -23,37 +23,37 @@ const sidebarItems = [
     title: "Dashboard",
     icon: LayoutDashboard,
     href: "/admin/dashboard",
-    color: "text-blue-400"
+    color: "text-white"
   },
   {
     title: "Users",
     icon: Users,
     href: "/admin/users",
-    color: "text-green-400"
+    color: "text-white"
   },
   {
     title: "Applications",
     icon: FileText,
     href: "/admin/applications",
-    color: "text-orange-400"
+    color: "text-white"
   },
   {
     title: "Consultants",
     icon: UserCheck,
     href: "/admin/consultants",
-    color: "text-purple-400"
+    color: "text-white"
   },
   {
     title: "Reports",
     icon: BarChart3,
     href: "/admin/reports",
-    color: "text-pink-400"
+    color: "text-white"
   },
   {
     title: "Database",
     icon: Database,
     href: "/admin/database",
-    color: "text-cyan-400"
+    color: "text-white"
   }
 ];
 
@@ -62,19 +62,19 @@ const bottomItems = [
     title: "Notifications",
     icon: Bell,
     href: "/admin/notifications",
-    color: "text-yellow-400"
+    color: "text-white"
   },
   {
     title: "Settings",
     icon: Settings,
     href: "/admin/settings",
-    color: "text-gray-400"
+    color: "text-white"
   },
   {
     title: "Help",
     icon: HelpCircle,
     href: "/admin/help",
-    color: "text-indigo-400"
+    color: "text-white"
   }
 ];
 
@@ -83,14 +83,14 @@ const AdminSidebar = ({ adminData, onLogout, collapsed, setCollapsed }) => {
 
   return (
     <div className={cn(
-      "fixed left-0 top-0 z-40 h-screen bg-gray-900 border-r border-gray-800 transition-all duration-300",
+      "fixed left-0 top-0 z-40 h-screen bg-white/10 backdrop-blur-md border-r border-white/20 transition-all duration-300",
       collapsed ? "w-16" : "w-64"
     )}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-800">
+      <div className="flex items-center justify-between p-4 border-b border-white/20">
         {!collapsed && (
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center border border-white/20">
               <span className="text-white font-bold text-sm">SC</span>
             </div>
             <div>
@@ -104,7 +104,7 @@ const AdminSidebar = ({ adminData, onLogout, collapsed, setCollapsed }) => {
           variant="ghost"
           size="sm"
           onClick={() => setCollapsed(!collapsed)}
-          className="text-gray-400 hover:text-white hover:bg-gray-800 p-2"
+          className="text-gray-400 hover:text-white hover:bg-white/10 backdrop-blur-sm p-2"
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </Button>
@@ -112,9 +112,9 @@ const AdminSidebar = ({ adminData, onLogout, collapsed, setCollapsed }) => {
 
       {/* Admin Info */}
       {!collapsed && (
-        <div className="p-4 border-b border-gray-800">
+        <div className="p-4 border-b border-white/20">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
               <span className="text-white font-semibold text-sm">
                 {adminData?.name ? adminData.name.charAt(0).toUpperCase() : 'A'}
               </span>
@@ -143,19 +143,17 @@ const AdminSidebar = ({ adminData, onLogout, collapsed, setCollapsed }) => {
               to={item.href}
               className={cn(
                 "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                isActive 
-                  ? "bg-gray-800 text-white border border-gray-700" 
-                  : "text-gray-300 hover:text-white hover:bg-gray-800",
+                "text-gray-300 hover:text-white hover:bg-white/10 ",
                 collapsed && "justify-center"
               )}
             >
-              <Icon className={cn("h-5 w-5", isActive ? "text-blue-400" : item.color)} />
+              <Icon className={cn("h-5 w-5", item.color)} />
               {!collapsed && <span>{item.title}</span>}
             </Link>
           );
         })}
         
-        <Separator className="my-4 bg-gray-800" />
+        <Separator className="my-4 bg-white/20" />
         
         {bottomItems.map((item, index) => {
           const Icon = item.icon;
@@ -167,13 +165,11 @@ const AdminSidebar = ({ adminData, onLogout, collapsed, setCollapsed }) => {
               to={item.href}
               className={cn(
                 "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                isActive 
-                  ? "bg-gray-800 text-white border border-gray-700" 
-                  : "text-gray-300 hover:text-white hover:bg-gray-800",
+                "text-gray-300 hover:text-white hover:bg-white/10 ",
                 collapsed && "justify-center"
               )}
             >
-              <Icon className={cn("h-5 w-5", isActive ? "text-blue-400" : item.color)} />
+              <Icon className={cn("h-5 w-5", item.color)} />
               {!collapsed && <span>{item.title}</span>}
             </Link>
           );
@@ -181,12 +177,12 @@ const AdminSidebar = ({ adminData, onLogout, collapsed, setCollapsed }) => {
       </nav>
 
       {/* Logout */}
-      <div className="p-3 border-t border-gray-800">
+      <div className="p-3 border-t border-white/20">
         <Button
           variant="ghost"
           onClick={onLogout}
           className={cn(
-            "w-full flex items-center space-x-3 px-3 py-2 text-red-400 hover:text-red-300 hover:bg-gray-800",
+            "w-full flex items-center space-x-3 px-3 py-2 text-red-400 hover:text-red-300 hover:bg-white/10 backdrop-blur-sm",
             collapsed && "justify-center"
           )}
         >

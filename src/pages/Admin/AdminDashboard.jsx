@@ -18,8 +18,8 @@ const AdminDashboard = () => {
       title: "Total Users",
       value: "2,543",
       icon: Users,
-      color: "text-blue-400",
-      bgColor: "bg-blue-900/20",
+      color: "text-white",
+      bgColor: "bg-gray-800",
       change: "+12%",
       changeType: "positive"
     },
@@ -27,8 +27,8 @@ const AdminDashboard = () => {
       title: "Applications",
       value: "1,234",
       icon: FileText,
-      color: "text-green-400",
-      bgColor: "bg-green-900/20",
+      color: "text-white",
+      bgColor: "bg-gray-800",
       change: "+8%",
       changeType: "positive"
     },
@@ -36,8 +36,8 @@ const AdminDashboard = () => {
       title: "Consultants",
       value: "156",
       icon: UserCheck,
-      color: "text-orange-400",
-      bgColor: "bg-orange-900/20",
+      color: "text-white",
+      bgColor: "bg-gray-800",
       change: "+3%",
       changeType: "positive"
     },
@@ -45,8 +45,8 @@ const AdminDashboard = () => {
       title: "Revenue",
       value: "$125,430",
       icon: TrendingUp,
-      color: "text-purple-400",
-      bgColor: "bg-purple-900/20",
+      color: "text-white",
+      bgColor: "bg-gray-800",
       change: "+15%",
       changeType: "positive"
     }
@@ -59,7 +59,7 @@ const AdminDashboard = () => {
       message: "New application submitted by John Doe",
       time: "2 minutes ago",
       icon: FileText,
-      color: "text-blue-400"
+      color: "text-white"
     },
     {
       id: 2,
@@ -67,7 +67,7 @@ const AdminDashboard = () => {
       message: "User Sarah Wilson registered",
       time: "15 minutes ago",
       icon: Users,
-      color: "text-green-400"
+      color: "text-white"
     },
     {
       id: 3,
@@ -75,7 +75,7 @@ const AdminDashboard = () => {
       message: "Consultant meeting scheduled",
       time: "1 hour ago",
       icon: Calendar,
-      color: "text-orange-400"
+      color: "text-white"
     },
     {
       id: 4,
@@ -83,7 +83,7 @@ const AdminDashboard = () => {
       message: "System backup completed",
       time: "2 hours ago",
       icon: CheckCircle,
-      color: "text-green-400"
+      color: "text-white"
     }
   ];
 
@@ -100,17 +100,17 @@ const AdminDashboard = () => {
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="bg-gray-900 border-gray-800 p-6">
+            <Card key={index} className="bg-white/10 backdrop-blur-md border-white/20 p-6 hover:bg-white/15 transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm font-medium">{stat.title}</p>
                   <p className="text-white text-2xl font-bold mt-2">{stat.value}</p>
                   <div className="flex items-center mt-2">
-                    <span className="text-green-400 text-sm font-medium">{stat.change}</span>
+                    <span className="text-white text-sm font-medium">{stat.change}</span>
                     <span className="text-gray-400 text-sm ml-1">from last month</span>
                   </div>
                 </div>
-                <div className={`${stat.bgColor} p-3 rounded-lg`}>
+                <div className="bg-white/10 backdrop-blur-sm p-3 rounded-lg border border-white/20">
                   <Icon className={`h-6 w-6 ${stat.color}`} />
                 </div>
               </div>
@@ -122,10 +122,10 @@ const AdminDashboard = () => {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Activity */}
-        <Card className="bg-gray-900 border-gray-800 p-6">
+        <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 hover:bg-white/15 transition-all duration-300">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-white text-lg font-semibold">Recent Activity</h3>
-            <Button variant="outline" size="sm" className="text-gray-400 border-gray-700 hover:bg-gray-800">
+            <Button variant="outline" size="sm" className="text-gray-400 border-white/30 hover:bg-white/10 backdrop-blur-sm">
               View All
             </Button>
           </div>
@@ -134,8 +134,8 @@ const AdminDashboard = () => {
             {recentActivities.map((activity) => {
               const Icon = activity.icon;
               return (
-                <div key={activity.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-800 transition-colors">
-                  <div className="p-2 bg-gray-800 rounded-lg">
+                <div key={activity.id} className="flex items-start space-x-3 p-3">
+                  <div className="p-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
                     <Icon className={`h-4 w-4 ${activity.color}`} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -149,27 +149,27 @@ const AdminDashboard = () => {
         </Card>
 
         {/* Quick Actions */}
-        <Card className="bg-gray-900 border-gray-800 p-6">
+        <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 hover:bg-white/15 transition-all duration-300">
           <h3 className="text-white text-lg font-semibold mb-6">Quick Actions</h3>
           
           <div className="grid grid-cols-2 gap-4">
-            <Button className="h-20 flex-col space-y-2 bg-blue-900 hover:bg-blue-800 border-blue-700">
-              <Users className="h-6 w-6 text-blue-400" />
+            <Button className="h-20 flex-col space-y-2 bg-white/10 backdrop-blur-sm hover:bg-white/20 border-white/30 transition-all duration-300">
+              <Users className="h-6 w-6 text-white" />
               <span className="text-sm">Manage Users</span>
             </Button>
             
-            <Button className="h-20 flex-col space-y-2 bg-green-900 hover:bg-green-800 border-green-700">
-              <FileText className="h-6 w-6 text-green-400" />
+            <Button className="h-20 flex-col space-y-2 bg-white/10 backdrop-blur-sm hover:bg-white/20 border-white/30 transition-all duration-300">
+              <FileText className="h-6 w-6 text-white" />
               <span className="text-sm">View Applications</span>
             </Button>
             
-            <Button className="h-20 flex-col space-y-2 bg-orange-900 hover:bg-orange-800 border-orange-700">
-              <UserCheck className="h-6 w-6 text-orange-400" />
+            <Button className="h-20 flex-col space-y-2 bg-white/10 backdrop-blur-sm hover:bg-white/20 border-white/30 transition-all duration-300">
+              <UserCheck className="h-6 w-6 text-white" />
               <span className="text-sm">Consultant Management</span>
             </Button>
             
-            <Button className="h-20 flex-col space-y-2 bg-purple-900 hover:bg-purple-800 border-purple-700">
-              <TrendingUp className="h-6 w-6 text-purple-400" />
+            <Button className="h-20 flex-col space-y-2 bg-white/10 backdrop-blur-sm hover:bg-white/20 border-white/30 transition-all duration-300">
+              <TrendingUp className="h-6 w-6 text-white" />
               <span className="text-sm">View Reports</span>
             </Button>
           </div>
@@ -177,9 +177,9 @@ const AdminDashboard = () => {
       </div>
 
       {/* Performance Chart Placeholder */}
-      <Card className="bg-gray-900 border-gray-800 p-6">
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 hover:bg-white/15 transition-all duration-300">
         <h3 className="text-white text-lg font-semibold mb-6">Performance Overview</h3>
-        <div className="h-64 bg-gray-800 rounded-lg flex items-center justify-center">
+        <div className="h-64 bg-white/5 backdrop-blur-sm rounded-lg flex items-center justify-center border border-white/10">
           <div className="text-center">
             <TrendingUp className="h-12 w-12 text-gray-600 mx-auto mb-4" />
             <p className="text-gray-400">Performance charts will be implemented here</p>
