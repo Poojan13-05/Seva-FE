@@ -1,14 +1,30 @@
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React, { useState } from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import AppRoutes from '@/routes/AppRoutes';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [adminData, setAdminData] = useState(null);
+
+  const handleLogin = (userData) => {
+    setAdminData(userData);
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setAdminData(null);
+  };
+
   return (
-    <div className="p-6 space-y-4">
-      <h2 className="text-xl font-semibold">Login</h2>
-      <Input type="email" placeholder="Enter your email" />
-      <Input type="password" placeholder="Enter your password" />
-      <Button>Login</Button>
-    </div>
+    <BrowserRouter>
+      <AppRoutes 
+        isLoggedIn={isLoggedIn}
+        adminData={adminData}
+        onLogin={handleLogin}
+        onLogout={handleLogout}
+      />
+    </BrowserRouter>
   );
 }
 
