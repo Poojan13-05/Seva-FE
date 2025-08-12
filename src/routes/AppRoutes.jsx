@@ -6,7 +6,7 @@ import AdminLayout from '@/layouts/AdminLayout';
 import SuperAdminDashboard from '@/pages/SuperAdmin/SuperAdminDashboard';
 import AdminDashboard from '@/pages/Admin/AdminDashboard';
 
-const AppRoutes = ({ isLoggedIn, adminData, onLogin, onLogout }) => {
+const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
   return (
     <Routes>
       {/* Public Routes */}
@@ -14,7 +14,7 @@ const AppRoutes = ({ isLoggedIn, adminData, onLogin, onLogout }) => {
         path="/login" 
         element={
           !isLoggedIn ? (
-            <LoginPage onLogin={onLogin} />
+            <LoginPage />
           ) : (
             <Navigate to={adminData?.role === 'super_admin' ? '/super-admin/dashboard' : '/admin/dashboard'} replace />
           )

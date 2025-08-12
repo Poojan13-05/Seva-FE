@@ -15,16 +15,22 @@ import {
   AlertTriangleIcon,
   LogInIcon 
 } from "@/components/ui/icons";
+import { useLogin } from '@/hooks/useAuth';
 
-const LoginPage = ({ onLogin }) => {
+const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  // Use the login mutation hook
+  const loginMutation = useLogin();
+
+  // Extract loading state and error from the mutation
+  const isLoading = loginMutation.isPending;
+  const error = loginMutation.error;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,45 +38,56 @@ const LoginPage = ({ onLogin }) => {
       ...prev,
       [name]: value
     }));
-    setError('');
+    
+    // Clear error when user starts typing
+    if (loginMutation.error) {
+      loginMutation.reset();
+    }
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     
     if (!formData.email || !formData.password) {
-      setError('Please fill in all fields');
       return;
     }
 
-    setIsLoading(true);
-    setError('');
-
-    // Simulate API call
-    setTimeout(() => {
-      if (formData.password === 'password') {
-        const userData = {
-          id: '1',
-          name: formData.email.includes('superadmin') ? 'Super Administrator' : 'Administrator',
-          email: formData.email,
-          role: formData.email.includes('superadmin') ? 'super_admin' : 'admin',
-          phone: '+91 98765 43210',
-          lastLogin: new Date().toISOString()
-        };
+    // Call the login mutation
+    loginMutation.mutate(formData, {
+      onSuccess: (data) => {
+        console.log('Login successful:', data);
         
-        onLogin(userData);
+        // Get the admin role from response
+        const adminRole = data.data.admin.role;
         
-        // Navigate based on role
-        if (userData.role === 'super_admin') {
-          navigate('/super-admin/dashboard');
+        // Navigate based on role with replace to prevent back navigation to login
+        if (adminRole === 'super_admin') {
+          navigate('/super-admin/dashboard', { replace: true });
         } else {
-          navigate('/admin/dashboard');
+          navigate('/admin/dashboard', { replace: true });
         }
-      } else {
-        setError('Invalid credentials. Please check your email and password.');
+      },
+      onError: (error) => {
+        console.error('Login failed:', error);
+        // Error is automatically handled by the mutation
       }
-      setIsLoading(false);
-    }, 1500);
+    });
+  };
+
+  // Get error message for display
+  const getErrorMessage = () => {
+    if (!error) return '';
+    
+    // Handle different error types
+    if (error.message) {
+      return error.message;
+    }
+    
+    if (error.response?.data?.message) {
+      return error.response.data.message;
+    }
+    
+    return 'Login failed. Please try again.';
   };
 
   return (
@@ -113,7 +130,7 @@ const LoginPage = ({ onLogin }) => {
                 <Alert variant="destructive" className="mb-6 border-red-300/50 bg-red-500/20 backdrop-blur-sm">
                   <AlertTriangleIcon className="h-4 w-4 text-red-300" />
                   <AlertDescription className="text-red-200">
-                    {error}
+                    {getErrorMessage()}
                   </AlertDescription>
                 </Alert>
               )}
@@ -184,6 +201,8 @@ const LoginPage = ({ onLogin }) => {
                   )}
                 </Button>
               </form>
+
+
             </div>
           </div>
         </div>
