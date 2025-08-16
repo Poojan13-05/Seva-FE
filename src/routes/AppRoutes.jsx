@@ -5,6 +5,7 @@ import SuperAdminLayout from '@/layouts/SuperAdminLayout';
 import AdminLayout from '@/layouts/AdminLayout';
 import SuperAdminDashboard from '@/pages/SuperAdmin/SuperAdminDashboard';
 import AdminDashboard from '@/pages/Admin/AdminDashboard';
+import AdminManagement from '@/pages/SuperAdmin/AdminManagement';
 
 const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
   return (
@@ -34,6 +35,7 @@ const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
       >
         <Route path="dashboard" element={<SuperAdminDashboard adminData={adminData} />} />
         <Route path="" element={<Navigate to="dashboard" replace />} />
+        <Route path="admins" element={<AdminManagement />} />
       </Route>
 
       {/* Protected Routes - Admin */}

@@ -22,75 +22,75 @@ import {
 } from 'lucide-react';
 
 const sidebarItems = [
-  {
-    title: "Dashboard",
-    icon: LayoutDashboard,
-    href: "/superadmin/dashboard",
-    color: "text-white"
-  },
+  // {
+  //   title: "Dashboard",
+  //   icon: LayoutDashboard,
+  //   href: "/superadmin/dashboard",
+  //   color: "text-white"
+  // },
   {
     title: "Admin Management",
     icon: Shield,
-    href: "/superadmin/admins",
+    href: "/super-admin/admins",
     color: "text-white"
   },
-  {
-    title: "Users",
-    icon: Users,
-    href: "/superadmin/users",
-    color: "text-white"
-  },
-  {
-    title: "Applications",
-    icon: FileText,
-    href: "/superadmin/applications",
-    color: "text-white"
-  },
-  {
-    title: "Consultants",
-    icon: UserCheck,
-    href: "/superadmin/consultants",
-    color: "text-white"
-  },
-  {
-    title: "System Activity",
-    icon: Activity,
-    href: "/superadmin/activity",
-    color: "text-white"
-  },
-  {
-    title: "Analytics",
-    icon: BarChart3,
-    href: "/superadmin/analytics",
-    color: "text-white"
-  },
-  {
-    title: "Database",
-    icon: Database,
-    href: "/superadmin/database",
-    color: "text-white"
-  }
+  // {
+  //   title: "Users",
+  //   icon: Users,
+  //   href: "/superadmin/users",
+  //   color: "text-white"
+  // },
+  // {
+  //   title: "Applications",
+  //   icon: FileText,
+  //   href: "/superadmin/applications",
+  //   color: "text-white"
+  // },
+  // {
+  //   title: "Consultants",
+  //   icon: UserCheck,
+  //   href: "/superadmin/consultants",
+  //   color: "text-white"
+  // },
+  // {
+  //   title: "System Activity",
+  //   icon: Activity,
+  //   href: "/superadmin/activity",
+  //   color: "text-white"
+  // },
+  // {
+  //   title: "Analytics",
+  //   icon: BarChart3,
+  //   href: "/superadmin/analytics",
+  //   color: "text-white"
+  // },
+  // {
+  //   title: "Database",
+  //   icon: Database,
+  //   href: "/superadmin/database",
+  //   color: "text-white"
+  // }
 ];
 
 const bottomItems = [
-  {
-    title: "System Settings",
-    icon: Settings,
-    href: "/superadmin/settings",
-    color: "text-white"
-  },
-  {
-    title: "Global Config",
-    icon: Globe,
-    href: "/superadmin/config",
-    color: "text-white"
-  },
-  {
-    title: "Help & Support",
-    icon: HelpCircle,
-    href: "/superadmin/help",
-    color: "text-white"
-  }
+  // {
+  //   title: "System Settings",
+  //   icon: Settings,
+  //   href: "/superadmin/settings",
+  //   color: "text-white"
+  // },
+  // {
+  //   title: "Global Config",
+  //   icon: Globe,
+  //   href: "/superadmin/config",
+  //   color: "text-white"
+  // },
+  // {
+  //   title: "Help & Support",
+  //   icon: HelpCircle,
+  //   href: "/superadmin/help",
+  //   color: "text-white"
+  // }
 ];
 
 const SuperAdminSidebar = ({ adminData, onLogout, collapsed, setCollapsed }) => {
@@ -168,7 +168,7 @@ const SuperAdminSidebar = ({ adminData, onLogout, collapsed, setCollapsed }) => 
           );
         })}
         
-        <Separator className="my-4 bg-white/20" />
+        {/* <Separator className="my-4 bg-white/20" />
         
         {bottomItems.map((item, index) => {
           const Icon = item.icon;
@@ -188,7 +188,7 @@ const SuperAdminSidebar = ({ adminData, onLogout, collapsed, setCollapsed }) => 
               {!collapsed && <span>{item.title}</span>}
             </Link>
           );
-        })}
+        })} */}
       </nav>
 
       {/* Logout */}
