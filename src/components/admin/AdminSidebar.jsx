@@ -26,9 +26,9 @@ const sidebarItems = [
     color: "text-white"
   },
   {
-    title: "Users",
+    title: "Customers",
     icon: Users,
-    href: "/admin/users",
+    href: "/admin/customers",
     color: "text-white"
   },
   {
