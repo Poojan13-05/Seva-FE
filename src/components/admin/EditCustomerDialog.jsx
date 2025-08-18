@@ -341,7 +341,13 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
           education: formData.personalDetails.education || undefined,
           nameOfBusinessJob: formData.personalDetails.nameOfBusinessJob || undefined,
           typeOfDuty: formData.personalDetails.typeOfDuty || undefined
-        }
+        },
+        // Ensure additionalDocuments includes the updated names
+        additionalDocuments: formData.additionalDocuments.map(doc => ({
+          name: doc.name,
+          documentUrl: doc.existingUrl,
+          _id: doc._id // Include ID if available
+        }))
       };
 
       // Prepare files for upload
@@ -357,9 +363,21 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
       }
 
       if (formData.additionalDocuments.length > 0) {
-        uploadFiles.additionalDocuments = formData.additionalDocuments.map(doc => doc.file).filter(Boolean);
-        uploadFiles.additionalDocumentNames = formData.additionalDocuments.map(doc => doc.name);
+        // Only send files, not metadata (which is in cleanedFormData)
+        uploadFiles.additionalDocuments = formData.additionalDocuments
+          .map(doc => doc.file)
+          .filter(Boolean);
+        
+        // Send names for new documents with files
+        uploadFiles.additionalDocumentNames = formData.additionalDocuments
+          .filter(doc => doc.file) // Only for docs with new files
+          .map(doc => doc.name);
       }
+
+      console.log("Sending payload:", {
+        customerData: cleanedFormData,
+        files: uploadFiles
+      });
 
       await updateMutation.mutateAsync({
         customerId: customer._id,
