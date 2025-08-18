@@ -24,28 +24,29 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Loader2, 
-  AlertTriangle, 
-  Plus, 
-  X, 
-  Upload, 
-  User, 
-  Building2, 
-  Users, 
+import {
+  Loader2,
+  AlertTriangle,
+  Plus,
+  X,
+  Upload,
+  User,
+  Building2,
+  Users,
   FileText,
   Camera,
   Save,
-  Edit
+  Edit,
+  ExternalLink
 } from 'lucide-react';
 import { useUpdateCustomer } from '@/hooks/useCustomer';
 
 // Indian states list
 const INDIAN_STATES = [
-  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", 
-  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", 
-  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", 
-  "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", 
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
+  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
+  "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
   "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
   "Delhi", "Jammu and Kashmir", "Ladakh", "Puducherry", "Chandigarh",
   "Andaman and Nicobar Islands", "Dadra and Nagar Haveli and Daman and Diu", "Lakshadweep"
@@ -63,8 +64,8 @@ const DOCUMENT_TYPES = [
 
 // Relationship types
 const RELATIONSHIPS = [
-  'husband', 'wife', 'daughter', 'brother', 'sister', 'son', 
-  'mother', 'father', 'mother_in_law', 'father_in_law', 
+  'husband', 'wife', 'daughter', 'brother', 'sister', 'son',
+  'mother', 'father', 'mother_in_law', 'father_in_law',
   'daughter_in_law', 'nephew', 'other'
 ];
 
@@ -109,7 +110,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
     documents: [],
     additionalDocuments: []
   });
-  
+
   const [errors, setErrors] = useState({});
   const updateMutation = useUpdateCustomer();
 
@@ -146,8 +147,18 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
         },
         corporateDetails: customer.corporateDetails || [],
         familyDetails: customer.familyDetails || [],
-        documents: customer.documents || [],
-        additionalDocuments: customer.additionalDocuments || []
+        documents: customer.documents?.map(doc => ({
+          documentType: doc.documentType || '',
+          file: null,
+          existingUrl: doc.documentUrl || '',
+          existingName: doc.filename || doc.name || 'Document'
+        })) || [],
+        additionalDocuments: customer.additionalDocuments?.map(doc => ({
+          name: doc.name || '',
+          file: null,
+          existingUrl: doc.documentUrl || '',
+          existingName: doc.filename || doc.name || 'Document'
+        })) || []
       });
       setErrors({});
       setFiles({
@@ -168,7 +179,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
         [field]: value
       }
     }));
-    
+
     // Clear field-specific error
     if (errors[`${section}.${field}`]) {
       setErrors(prev => ({
@@ -182,7 +193,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
   const handleArrayFieldChange = (section, index, field, value) => {
     setFormData(prev => ({
       ...prev,
-      [section]: prev[section].map((item, i) => 
+      [section]: prev[section].map((item, i) =>
         i === index ? { ...item, [field]: value } : item
       )
     }));
@@ -306,7 +317,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -335,16 +346,16 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
 
       // Prepare files for upload
       const uploadFiles = {};
-      
+
       if (files.profilePhoto) {
         uploadFiles.profilePhoto = files.profilePhoto;
       }
-      
+
       if (formData.documents.length > 0) {
         uploadFiles.documents = formData.documents.map(doc => doc.file).filter(Boolean);
         uploadFiles.documentTypes = formData.documents.map(doc => doc.documentType);
       }
-      
+
       if (formData.additionalDocuments.length > 0) {
         uploadFiles.additionalDocuments = formData.additionalDocuments.map(doc => doc.file).filter(Boolean);
         uploadFiles.additionalDocumentNames = formData.additionalDocuments.map(doc => doc.name);
@@ -355,7 +366,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
         customerData: cleanedFormData,
         files: uploadFiles
       });
-      
+
       onOpenChange(false);
     } catch (error) {
       console.error('Update customer error:', error);
@@ -398,8 +409,8 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                 <Label htmlFor="customerType" className="text-white">
                   Select Customer Type <span className="text-red-400">*</span>
                 </Label>
-                <Select 
-                  value={formData.customerType} 
+                <Select
+                  value={formData.customerType}
                   onValueChange={(value) => {
                     setFormData(prev => ({ ...prev, customerType: value }));
                     // Clear customer type error
@@ -488,7 +499,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                         <p className="text-red-400 text-sm">{errors['personalDetails.firstName']}</p>
                       )}
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="middleName" className="text-white">Middle Name</Label>
                       <Input
@@ -499,7 +510,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                         disabled={updateMutation.isPending}
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="lastName" className="text-white">
                         Last Name <span className="text-red-400">*</span>
@@ -535,7 +546,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                         <p className="text-red-400 text-sm">{errors['personalDetails.mobileNumber']}</p>
                       )}
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="email" className="text-white">
                         Email <span className="text-red-400">*</span>
@@ -560,8 +571,8 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                       <Label htmlFor="state" className="text-white">
                         State <span className="text-red-400">*</span>
                       </Label>
-                      <Select 
-                        value={formData.personalDetails.state} 
+                      <Select
+                        value={formData.personalDetails.state}
                         onValueChange={(value) => handleFieldChange('personalDetails', 'state', value)}
                       >
                         <SelectTrigger className="bg-white/10 border-white/30 text-white">
@@ -579,7 +590,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                         <p className="text-red-400 text-sm">{errors['personalDetails.state']}</p>
                       )}
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="city" className="text-white">
                         City <span className="text-red-400">*</span>
@@ -595,7 +606,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                         <p className="text-red-400 text-sm">{errors['personalDetails.city']}</p>
                       )}
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="country" className="text-white">Country</Label>
                       <Input
@@ -643,7 +654,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                         <p className="text-red-400 text-sm">{errors['personalDetails.birthDate']}</p>
                       )}
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="age" className="text-white">Age</Label>
                       <Input
@@ -655,13 +666,13 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                         disabled={updateMutation.isPending}
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="gender" className="text-white">
                         Gender <span className="text-red-400">*</span>
                       </Label>
-                      <Select 
-                        value={formData.personalDetails.gender} 
+                      <Select
+                        value={formData.personalDetails.gender}
                         onValueChange={(value) => handleFieldChange('personalDetails', 'gender', value)}
                       >
                         <SelectTrigger className="bg-white/10 border-white/30 text-white">
@@ -677,13 +688,13 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                         <p className="text-red-400 text-sm">{errors['personalDetails.gender']}</p>
                       )}
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="maritalStatus" className="text-white">
                         Marital Status <span className="text-red-400">*</span>
                       </Label>
-                      <Select 
-                        value={formData.personalDetails.maritalStatus} 
+                      <Select
+                        value={formData.personalDetails.maritalStatus}
                         onValueChange={(value) => handleFieldChange('personalDetails', 'maritalStatus', value)}
                       >
                         <SelectTrigger className="bg-white/10 border-white/30 text-white">
@@ -715,7 +726,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                         disabled={updateMutation.isPending}
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="weight" className="text-white">Weight (kg)</Label>
                       <Input
@@ -728,7 +739,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                         disabled={updateMutation.isPending}
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="education" className="text-white">Education</Label>
                       <Input
@@ -759,8 +770,8 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="businessOrJob" className="text-white">Business / Job</Label>
-                      <Select 
-                        value={formData.personalDetails.businessOrJob} 
+                      <Select
+                        value={formData.personalDetails.businessOrJob}
                         onValueChange={(value) => handleFieldChange('personalDetails', 'businessOrJob', value)}
                       >
                         <SelectTrigger className="bg-white/10 border-white/30 text-white">
@@ -772,7 +783,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                         </SelectContent>
                       </Select>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="nameOfBusinessJob" className="text-white">Name of Business/Job</Label>
                       <Input
@@ -812,7 +823,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                         disabled={updateMutation.isPending}
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="panNumber" className="text-white">PAN Number</Label>
                       <Input
@@ -824,7 +835,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                         disabled={updateMutation.isPending}
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="gstNumber" className="text-white">GST Number</Label>
                       <Input
@@ -842,18 +853,24 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                   <div className="space-y-2">
                     <Label className="text-white">Profile Photo</Label>
                     <div className="flex items-center space-x-4">
-                      <div className="w-20 h-20 bg-white/10 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center">
+                      <div className="w-20 h-20 bg-white/10 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center overflow-hidden">
                         {files.profilePhoto ? (
-                          <img 
-                            src={URL.createObjectURL(files.profilePhoto)} 
-                            alt="Profile" 
+                          <img
+                            src={URL.createObjectURL(files.profilePhoto)}
+                            alt="Profile"
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                        ) : formData.personalDetails.profilePhoto ? (
+                          <img
+                            src={formData.personalDetails.profilePhoto}
+                            alt="Profile"
                             className="w-full h-full object-cover rounded-lg"
                           />
                         ) : (
                           <Camera className="h-8 w-8 text-gray-400" />
                         )}
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <Input
                           type="file"
                           accept="image/*"
@@ -862,6 +879,11 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                           disabled={updateMutation.isPending}
                         />
                         <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</p>
+                        {(formData.personalDetails.profilePhoto || files.profilePhoto) && (
+                          <p className="text-xs text-green-400 mt-1">
+                            {files.profilePhoto ? 'New photo selected' : 'Current photo uploaded'}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -976,8 +998,8 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                               <Label className="text-white">
                                 Gender <span className="text-red-400">*</span>
                               </Label>
-                              <Select 
-                                value={family.gender} 
+                              <Select
+                                value={family.gender}
                                 onValueChange={(value) => handleArrayFieldChange('familyDetails', index, 'gender', value)}
                               >
                                 <SelectTrigger className="bg-white/10 border-white/30 text-white">
@@ -994,8 +1016,8 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                               <Label className="text-white">
                                 Relationship <span className="text-red-400">*</span>
                               </Label>
-                              <Select 
-                                value={family.relationship} 
+                              <Select
+                                value={family.relationship}
                                 onValueChange={(value) => handleArrayFieldChange('familyDetails', index, 'relationship', value)}
                               >
                                 <SelectTrigger className="bg-white/10 border-white/30 text-white">
@@ -1167,8 +1189,8 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                               <Label className="text-white">
                                 State <span className="text-red-400">*</span>
                               </Label>
-                              <Select 
-                                value={corp.state} 
+                              <Select
+                                value={corp.state}
                                 onValueChange={(value) => handleArrayFieldChange('corporateDetails', index, 'state', value)}
                               >
                                 <SelectTrigger className="bg-white/10 border-white/30 text-white">
@@ -1277,8 +1299,8 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                               <Label className="text-white">
                                 Document Type <span className="text-red-400">*</span>
                               </Label>
-                              <Select 
-                                value={doc.documentType} 
+                              <Select
+                                value={doc.documentType}
                                 onValueChange={(value) => handleArrayFieldChange('documents', index, 'documentType', value)}
                               >
                                 <SelectTrigger className="bg-white/10 border-white/30 text-white">
@@ -1293,10 +1315,34 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                                 </SelectContent>
                               </Select>
                             </div>
-                            
+
+                            {/* Show existing document if available */}
+                            {doc.existingUrl && !doc.file && (
+                              <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center space-x-2">
+                                    <FileText className="h-4 w-4 text-blue-400" />
+                                    <div>
+                                      <p className="text-blue-400 text-sm font-medium">Current Document</p>
+                                      <p className="text-gray-400 text-xs">{doc.existingName}</p>
+                                    </div>
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-blue-400 hover:text-blue-300 hover:bg-blue-400/10"
+                                    onClick={() => window.open(doc.existingUrl, '_blank', 'noopener,noreferrer')}
+                                  >
+                                    <ExternalLink className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
+
                             <div className="space-y-2">
                               <Label className="text-white">
-                                Upload File <span className="text-red-400">*</span>
+                                {doc.existingUrl ? 'Replace File' : 'Upload File'} <span className="text-red-400">*</span>
                               </Label>
                               <Input
                                 type="file"
@@ -1307,11 +1353,11 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                               />
                               <p className="text-xs text-gray-400">PDF, DOC, JPG, PNG up to 5MB</p>
                             </div>
-                            
+
                             {doc.file && (
                               <div className="flex items-center space-x-2 text-green-400">
                                 <Upload className="h-4 w-4" />
-                                <span className="text-sm">{doc.file.name}</span>
+                                <span className="text-sm">New file: {doc.file.name}</span>
                               </div>
                             )}
                           </CardContent>
@@ -1375,10 +1421,34 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                                 disabled={updateMutation.isPending}
                               />
                             </div>
-                            
+
+                            {/* Show existing document if available */}
+                            {doc.existingUrl && !doc.file && (
+                              <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center space-x-2">
+                                    <FileText className="h-4 w-4 text-orange-400" />
+                                    <div>
+                                      <p className="text-orange-400 text-sm font-medium">Current Document</p>
+                                      <p className="text-gray-400 text-xs">{doc.existingName}</p>
+                                    </div>
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-orange-400 hover:text-orange-300 hover:bg-orange-400/10"
+                                    onClick={() => window.open(doc.existingUrl, '_blank', 'noopener,noreferrer')}
+                                  >
+                                    <ExternalLink className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
+
                             <div className="space-y-2">
                               <Label className="text-white">
-                                Upload File <span className="text-red-400">*</span>
+                                {doc.existingUrl ? 'Replace File' : 'Upload File'} <span className="text-red-400">*</span>
                               </Label>
                               <Input
                                 type="file"
@@ -1389,11 +1459,11 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
                               />
                               <p className="text-xs text-gray-400">PDF, DOC, JPG, PNG up to 5MB</p>
                             </div>
-                            
+
                             {doc.file && (
                               <div className="flex items-center space-x-2 text-green-400">
                                 <Upload className="h-4 w-4" />
-                                <span className="text-sm">{doc.file.name}</span>
+                                <span className="text-sm">New file: {doc.file.name}</span>
                               </div>
                             )}
                           </CardContent>
