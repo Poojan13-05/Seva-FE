@@ -119,6 +119,14 @@ export const customerService = {
         formData.append('familyDetails', JSON.stringify(customerData.familyDetails));
       }
       
+      // Send complete document arrays (existing + new)
+      if (customerData.documents) {
+        formData.append('documents', JSON.stringify(customerData.documents));
+      }
+      if (customerData.additionalDocuments) {
+        formData.append('additionalDocuments', JSON.stringify(customerData.additionalDocuments));
+      }
+      
       // Add customer type
       if (customerData.customerType) {
         formData.append('customerType', customerData.customerType);
@@ -129,17 +137,22 @@ export const customerService = {
         formData.append('profilePhoto', files.profilePhoto);
       }
       
+      // FIXED: Use consistent field names for new documents
       if (files.documents && files.documents.length > 0) {
         files.documents.forEach((file, index) => {
-          formData.append('documents', file);
-          formData.append('documentTypes', files.documentTypes[index] || 'other');
+          formData.append('newDocuments', file);
+          if (files.documentTypes && files.documentTypes[index]) {
+            formData.append('newDocumentTypes', files.documentTypes[index]);
+          }
         });
       }
       
       if (files.additionalDocuments && files.additionalDocuments.length > 0) {
         files.additionalDocuments.forEach((file, index) => {
-          formData.append('additionalDocuments', file);
-          formData.append('additionalDocumentNames', files.additionalDocumentNames[index] || file.name);
+          formData.append('newAdditionalDocuments', file);
+          if (files.additionalDocumentNames && files.additionalDocumentNames[index]) {
+            formData.append('newAdditionalDocumentNames', files.additionalDocumentNames[index]);
+          }
         });
       }
 

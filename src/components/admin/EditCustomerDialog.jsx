@@ -117,6 +117,14 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
   // Initialize form data when customer changes
   useEffect(() => {
     if (customer && open) {
+      // Helper function to format date for input field
+      const formatDateForInput = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        // Format as YYYY-MM-DD for HTML date input
+        return date.toISOString().split('T')[0];
+      };
+
       setFormData({
         customerType: customer.customerType || 'individual',
         personalDetails: {
@@ -130,7 +138,7 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
           country: customer.personalDetails?.country || 'India',
           address: customer.personalDetails?.address || '',
           birthPlace: customer.personalDetails?.birthPlace || '',
-          birthDate: customer.personalDetails?.birthDate || '',
+          birthDate: formatDateForInput(customer.personalDetails?.birthDate), // Fixed date formatting
           age: customer.personalDetails?.age || '',
           gender: customer.personalDetails?.gender || '',
           height: customer.personalDetails?.height || '',
@@ -146,18 +154,23 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
           profilePhoto: customer.personalDetails?.profilePhoto || ''
         },
         corporateDetails: customer.corporateDetails || [],
-        familyDetails: customer.familyDetails || [],
+        familyDetails: customer.familyDetails?.map(family => ({
+          ...family,
+          birthDate: formatDateForInput(family.birthDate) // Also fix family member birth dates
+        })) || [],
         documents: customer.documents?.map(doc => ({
+          _id: doc._id, // Include the MongoDB _id
           documentType: doc.documentType || '',
           file: null,
           existingUrl: doc.documentUrl || '',
-          existingName: doc.filename || doc.name || 'Document'
+          existingName: doc.filename || doc.name || doc.originalName || 'Document'
         })) || [],
         additionalDocuments: customer.additionalDocuments?.map(doc => ({
+          _id: doc._id, // Include the MongoDB _id
           name: doc.name || '',
           file: null,
           existingUrl: doc.documentUrl || '',
-          existingName: doc.filename || doc.name || 'Document'
+          existingName: doc.filename || doc.name || doc.originalName || 'Document'
         })) || []
       });
       setErrors({});
@@ -342,11 +355,19 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
           nameOfBusinessJob: formData.personalDetails.nameOfBusinessJob || undefined,
           typeOfDuty: formData.personalDetails.typeOfDuty || undefined
         },
-        // Ensure additionalDocuments includes the updated names
-        additionalDocuments: formData.additionalDocuments.map(doc => ({
-          name: doc.name,
-          documentUrl: doc.existingUrl,
-          _id: doc._id // Include ID if available
+        // FIXED: Only send existing documents that don't have new files
+        documents: formData.documents.filter(doc => !doc.file).map(doc => ({
+          _id: doc._id,
+          documentType: doc.documentType,
+          existingUrl: doc.existingUrl,
+          existingName: doc.existingName
+        })),
+        // FIXED: Only send existing additional documents that don't have new files
+        additionalDocuments: formData.additionalDocuments.filter(doc => !doc.file).map(doc => ({
+          _id: doc._id,
+          name: doc.name, // Include updated name
+          existingUrl: doc.existingUrl,
+          existingName: doc.existingName
         }))
       };
 
@@ -357,21 +378,30 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
         uploadFiles.profilePhoto = files.profilePhoto;
       }
 
-      if (formData.documents.length > 0) {
-        uploadFiles.documents = formData.documents.map(doc => doc.file).filter(Boolean);
-        uploadFiles.documentTypes = formData.documents.map(doc => doc.documentType);
+      // Only send new documents with files
+      const newDocuments = formData.documents.filter(doc => doc.file);
+      if (newDocuments.length > 0) {
+        uploadFiles.documents = newDocuments.map(doc => doc.file);
+        uploadFiles.documentTypes = newDocuments.map(doc => doc.documentType);
       }
 
-      if (formData.additionalDocuments.length > 0) {
-        // Only send files, not metadata (which is in cleanedFormData)
-        uploadFiles.additionalDocuments = formData.additionalDocuments
-          .map(doc => doc.file)
-          .filter(Boolean);
+      // FIXED: Handle additional documents with replacement logic
+      const newAdditionalDocs = formData.additionalDocuments.filter(doc => doc.file);
+      if (newAdditionalDocs.length > 0) {
+        uploadFiles.additionalDocuments = newAdditionalDocs.map(doc => doc.file);
+        uploadFiles.additionalDocumentNames = newAdditionalDocs.map(doc => doc.name);
         
-        // Send names for new documents with files
-        uploadFiles.additionalDocumentNames = formData.additionalDocuments
-          .filter(doc => doc.file) // Only for docs with new files
-          .map(doc => doc.name);
+        // FIXED: For documents being replaced, we need to include them in the existing list
+        // but mark them for replacement by matching the name
+        newAdditionalDocs.forEach(newDoc => {
+          // Check if this document name already exists in the existing documents
+          const existingIndex = cleanedFormData.additionalDocuments.findIndex(existing => existing.name === newDoc.name);
+          if (existingIndex === -1) {
+            // If it doesn't exist, it's a completely new document - no need to add to existing
+            // The backend will handle adding it
+          }
+          // If it exists, the backend will replace it based on matching names
+        });
       }
 
       console.log("Sending payload:", {
