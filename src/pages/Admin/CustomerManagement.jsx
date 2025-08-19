@@ -318,19 +318,43 @@ const CustomerManagement = () => {
       {/* Dialogs */}
       <CreateCustomerDialog
         open={showCreateDialog}
-        onOpenChange={setShowCreateDialog}
+        onOpenChange={(open) => {
+          setShowCreateDialog(open);
+          // Add a small delay to ensure DOM updates properly
+          if (!open) {
+            setTimeout(() => {
+              document.body.style.pointerEvents = 'auto';
+            }, 10);
+          }
+        }}
       />
 
       <EditCustomerDialog
         customer={editingCustomer}
         open={!!editingCustomer}
-        onOpenChange={(open) => !open && setEditingCustomer(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingCustomer(null);
+            // Add a small delay to ensure DOM updates properly
+            setTimeout(() => {
+              document.body.style.pointerEvents = 'auto';
+            }, 10);
+          }
+        }}
       />
 
       <ViewCustomerDialog
         customer={viewingCustomer}
         open={!!viewingCustomer}
-        onOpenChange={(open) => !open && setViewingCustomer(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setViewingCustomer(null);
+            // Add a small delay to ensure DOM updates properly
+            setTimeout(() => {
+              document.body.style.pointerEvents = 'auto';
+            }, 10);
+          }
+        }}
       />
     </div>
   );
