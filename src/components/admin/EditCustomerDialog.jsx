@@ -111,6 +111,13 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
     additionalDocuments: []
   });
 
+  // PHASE 1: Track deleted files
+  const [deletedFiles, setDeletedFiles] = useState({
+    profilePhoto: null,
+    documents: [],
+    additionalDocuments: []
+  });
+
   const [errors, setErrors] = useState({});
   const updateMutation = useUpdateCustomer();
 
@@ -180,6 +187,12 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
         additionalDocuments: []
       });
       setActiveTab("personal");
+      // Reset deleted files tracking
+      setDeletedFiles({
+        profilePhoto: null,
+        documents: [],
+        additionalDocuments: []
+      });
     }
   }, [customer, open]);
 
@@ -251,6 +264,22 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
 
   // Remove item from array sections
   const removeArrayItem = (section, index) => {
+    if (section === 'documents' || section === 'additionalDocuments') {
+      const itemToRemove = formData[section][index];
+      
+      // If the item has an existing URL, add it to deleted files
+      if (itemToRemove && itemToRemove.existingUrl) {
+        setDeletedFiles(prev => ({
+          ...prev,
+          [section]: [...prev[section], {
+            _id: itemToRemove._id,
+            documentUrl: itemToRemove.existingUrl,
+            name: itemToRemove.name || itemToRemove.documentType
+          }]
+        }));
+      }
+    }
+
     setFormData(prev => ({
       ...prev,
       [section]: prev[section].filter((_, i) => i !== index)
@@ -260,8 +289,29 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
   // Handle file uploads
   const handleFileChange = (type, file, index = null) => {
     if (type === 'profilePhoto') {
+      // FIXED: Track old profile photo for deletion when replacing
+      if (formData.personalDetails.profilePhoto) {
+        setDeletedFiles(prev => ({
+          ...prev,
+          profilePhoto: formData.personalDetails.profilePhoto
+        }));
+      }
       setFiles(prev => ({ ...prev, profilePhoto: file }));
     } else if (type === 'documents' && index !== null) {
+      const currentDoc = formData.documents[index];
+      
+      // FIXED: If replacing an existing document, add old one to deleted files
+      if (currentDoc && currentDoc.existingUrl) {
+        setDeletedFiles(prev => ({
+          ...prev,
+          documents: [...prev.documents.filter(doc => doc._id !== currentDoc._id), {
+            _id: currentDoc._id,
+            documentUrl: currentDoc.existingUrl,
+            documentType: currentDoc.documentType
+          }]
+        }));
+      }
+      
       setFiles(prev => ({
         ...prev,
         documents: prev.documents.map((item, i) => i === index ? file : item)
@@ -269,6 +319,20 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
       // Also update the formData
       handleArrayFieldChange('documents', index, 'file', file);
     } else if (type === 'additionalDocuments' && index !== null) {
+      const currentDoc = formData.additionalDocuments[index];
+      
+      // FIXED: If replacing an existing additional document, add old one to deleted files
+      if (currentDoc && currentDoc.existingUrl) {
+        setDeletedFiles(prev => ({
+          ...prev,
+          additionalDocuments: [...prev.additionalDocuments.filter(doc => doc._id !== currentDoc._id), {
+            _id: currentDoc._id,
+            documentUrl: currentDoc.existingUrl,
+            name: currentDoc.name
+          }]
+        }));
+      }
+      
       setFiles(prev => ({
         ...prev,
         additionalDocuments: prev.additionalDocuments.map((item, i) => i === index ? file : item)
@@ -406,13 +470,15 @@ const EditCustomerDialog = ({ customer, open, onOpenChange }) => {
 
       console.log("Sending payload:", {
         customerData: cleanedFormData,
-        files: uploadFiles
+        files: uploadFiles,
+        deletedFiles: deletedFiles // PHASE 1: Include deleted files info
       });
 
       await updateMutation.mutateAsync({
         customerId: customer._id,
         customerData: cleanedFormData,
-        files: uploadFiles
+        files: uploadFiles,
+        deletedFiles: deletedFiles // PHASE 1: Pass deleted files to mutation
       });
 
       onOpenChange(false);

@@ -104,7 +104,7 @@ export const customerService = {
   },
 
   // Update customer
-  updateCustomer: async (customerId, customerData, files = {}) => {
+  updateCustomer: async (customerId, customerData, files = {}, deletedFiles = {}) => {
     try {
       const formData = new FormData();
       
@@ -125,6 +125,17 @@ export const customerService = {
       }
       if (customerData.additionalDocuments) {
         formData.append('additionalDocuments', JSON.stringify(customerData.additionalDocuments));
+      }
+
+      // PHASE 1: Send information about deleted files
+      if (deletedFiles.documents && deletedFiles.documents.length > 0) {
+        formData.append('deletedDocuments', JSON.stringify(deletedFiles.documents));
+      }
+      if (deletedFiles.additionalDocuments && deletedFiles.additionalDocuments.length > 0) {
+        formData.append('deletedAdditionalDocuments', JSON.stringify(deletedFiles.additionalDocuments));
+      }
+      if (deletedFiles.profilePhoto) {
+        formData.append('deletedProfilePhoto', deletedFiles.profilePhoto);
       }
       
       // Add customer type

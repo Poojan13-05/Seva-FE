@@ -76,8 +76,8 @@ export const useUpdateCustomer = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ customerId, customerData, files }) => 
-      customerService.updateCustomer(customerId, customerData, files),
+    mutationFn: ({ customerId, customerData, files, deletedFiles }) => 
+      customerService.updateCustomer(customerId, customerData, files, deletedFiles),
     onSuccess: (data, variables) => {
       queryClient.setQueryData(
         customerKeys.detail(variables.customerId),
