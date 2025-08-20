@@ -18,7 +18,8 @@ import {
   ChevronRight,
   Shield,
   Activity,
-  Globe
+  Globe,
+  Trash2
 } from 'lucide-react';
 
 const sidebarItems = [
@@ -32,6 +33,12 @@ const sidebarItems = [
     title: "Admin Management",
     icon: Shield,
     href: "/super-admin/admins",
+    color: "text-white"
+  },
+  {
+    title: "Deleted Customers",
+    icon: Trash2,
+    href: "/super-admin/deleted-customers",
     color: "text-white"
   },
   // {

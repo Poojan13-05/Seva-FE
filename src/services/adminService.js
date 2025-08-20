@@ -124,3 +124,57 @@ export const adminService = {
     }
   }
 };
+
+// Super Admin specific services for customer management
+export const superAdminService = {
+  // Get deleted customers
+  getDeletedCustomers: async (params = {}) => {
+    try {
+      const {
+        page = 1,
+        limit = 10,
+        search = '',
+        customerType = 'all',
+        sortBy = 'updatedAt',
+        sortOrder = 'desc'
+      } = params;
+
+      const response = await api.get('/super-admin/customers/deleted', {
+        params: {
+          page,
+          limit,
+          search,
+          customerType,
+          sortBy,
+          sortOrder
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching deleted customers:', error);
+      throw error.response?.data || error;
+    }
+  },
+
+  // Get deleted customer statistics
+  getDeletedCustomerStats: async () => {
+    try {
+      const response = await api.get('/super-admin/customers/deleted/stats');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching deleted customer stats:', error);
+      throw error.response?.data || error;
+    }
+  },
+
+  // Permanently delete customer
+  permanentlyDeleteCustomer: async (customerId) => {
+    try {
+      const response = await api.delete(`/super-admin/customers/${customerId}/permanent`);
+      return response.data;
+    } catch (error) {
+      console.error('Error permanently deleting customer:', error);
+      throw error.response?.data || error;
+    }
+  }
+};

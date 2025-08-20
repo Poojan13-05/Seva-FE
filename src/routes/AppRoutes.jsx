@@ -7,8 +7,10 @@ import SuperAdminDashboard from '@/pages/SuperAdmin/SuperAdminDashboard';
 import AdminDashboard from '@/pages/Admin/AdminDashboard';
 import CustomerManagement from '@/pages/Admin/CustomerManagement';
 import AdminManagement from '@/pages/SuperAdmin/AdminManagement';
+import DeletedCustomers from '@/pages/SuperAdmin/DeletedCustomers';
 import ComingSoon from '@/components/admin/ComingSoon';
 import { FileText, UserCheck, BarChart3, Database, Bell, Settings, HelpCircle } from 'lucide-react';
+
 
 const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
   return (
@@ -39,6 +41,7 @@ const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
         <Route path="dashboard" element={<SuperAdminDashboard adminData={adminData} />} />
         <Route path="" element={<Navigate to="dashboard" replace />} />
         <Route path="admins" element={<AdminManagement />} />
+        <Route path="deleted-customers" element={<DeletedCustomers/>} />
       </Route>
 
       {/* Protected Routes - Admin */}
