@@ -6,8 +6,10 @@ import AdminLayout from '@/layouts/AdminLayout';
 import SuperAdminDashboard from '@/pages/SuperAdmin/SuperAdminDashboard';
 import AdminDashboard from '@/pages/Admin/AdminDashboard';
 import CustomerManagement from '@/pages/Admin/CustomerManagement';
+import LifeInsuranceManagement from '@/pages/Admin/LifeInsuranceManagement';
 import AdminManagement from '@/pages/SuperAdmin/AdminManagement';
 import DeletedCustomers from '@/pages/SuperAdmin/DeletedCustomers';
+import DeletedLifeInsurancePolicies from '@/pages/SuperAdmin/DeletedLifeInsurancePolicies';
 import ComingSoon from '@/components/admin/ComingSoon';
 import { FileText, UserCheck, BarChart3, Database, Bell, Settings, HelpCircle } from 'lucide-react';
 
@@ -42,6 +44,7 @@ const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
         <Route path="" element={<Navigate to="dashboard" replace />} />
         <Route path="admins" element={<AdminManagement />} />
         <Route path="deleted-customers" element={<DeletedCustomers/>} />
+        <Route path="deleted-life-insurance" element={<DeletedLifeInsurancePolicies/>} />
       </Route>
 
       {/* Protected Routes - Admin */}
@@ -58,6 +61,7 @@ const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
         <Route path="dashboard" element={<AdminDashboard adminData={adminData} />} />
         <Route path="" element={<Navigate to="dashboard" replace />} />
         <Route path="customers" element={<CustomerManagement />} />
+        <Route path="life-insurance" element={<LifeInsuranceManagement />} />
         <Route 
           path="applications" 
           element={

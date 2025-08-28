@@ -176,5 +176,58 @@ export const superAdminService = {
       console.error('Error permanently deleting customer:', error);
       throw error.response?.data || error;
     }
+  },
+
+  // Get deleted life insurance policies
+  getDeletedLifeInsurancePolicies: async (params = {}) => {
+    try {
+      const {
+        page = 1,
+        limit = 10,
+        search = '',
+        insuranceCompany = 'all',
+        policyType = 'all',
+        sortBy = 'updatedAt',
+        sortOrder = 'desc'
+      } = params;
+
+      const response = await api.get('/super-admin/life-insurance/deleted', {
+        params: {
+          page,
+          limit,
+          search,
+          insuranceCompany,
+          policyType,
+          sortBy,
+          sortOrder
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching deleted life insurance policies:', error);
+      throw error.response?.data || error;
+    }
+  },
+
+  // Get deleted life insurance statistics
+  getDeletedLifeInsuranceStats: async () => {
+    try {
+      const response = await api.get('/super-admin/life-insurance/deleted/stats');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching deleted life insurance stats:', error);
+      throw error.response?.data || error;
+    }
+  },
+
+  // Permanently delete life insurance policy
+  permanentlyDeleteLifeInsurancePolicy: async (policyId) => {
+    try {
+      const response = await api.delete(`/super-admin/life-insurance/${policyId}/permanent`);
+      return response.data;
+    } catch (error) {
+      console.error('Error permanently deleting life insurance policy:', error);
+      throw error.response?.data || error;
+    }
   }
 };

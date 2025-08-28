@@ -15,7 +15,8 @@ import {
   HelpCircle,
   LogOut,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Shield
 } from 'lucide-react';
 
 const sidebarItems = [
@@ -29,6 +30,12 @@ const sidebarItems = [
     title: "Customers",
     icon: Users,
     href: "/admin/customers",
+    color: "text-white"
+  },
+  {
+    title: "Life Insurance",
+    icon: Shield,
+    href: "/admin/life-insurance",
     color: "text-white"
   },
   {

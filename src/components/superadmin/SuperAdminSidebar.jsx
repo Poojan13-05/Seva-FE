@@ -41,6 +41,12 @@ const sidebarItems = [
     href: "/super-admin/deleted-customers",
     color: "text-white"
   },
+  {
+    title: "Deleted Life Insurance",
+    icon: FileText,
+    href: "/super-admin/deleted-life-insurance",
+    color: "text-white"
+  },
   // {
   //   title: "Users",
   //   icon: Users,
