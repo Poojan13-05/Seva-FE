@@ -3,15 +3,11 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from '@/pages/LoginPage';
 import SuperAdminLayout from '@/layouts/SuperAdminLayout';
 import AdminLayout from '@/layouts/AdminLayout';
-import SuperAdminDashboard from '@/pages/SuperAdmin/SuperAdminDashboard';
-import AdminDashboard from '@/pages/Admin/AdminDashboard';
 import CustomerManagement from '@/pages/Admin/CustomerManagement';
 import LifeInsuranceManagement from '@/pages/Admin/LifeInsuranceManagement';
 import AdminManagement from '@/pages/SuperAdmin/AdminManagement';
 import DeletedCustomers from '@/pages/SuperAdmin/DeletedCustomers';
 import DeletedLifeInsurancePolicies from '@/pages/SuperAdmin/DeletedLifeInsurancePolicies';
-import ComingSoon from '@/components/admin/ComingSoon';
-import { FileText, UserCheck, BarChart3, Database, Bell, Settings, HelpCircle } from 'lucide-react';
 
 
 const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
@@ -24,7 +20,7 @@ const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
           !isLoggedIn ? (
             <LoginPage />
           ) : (
-            <Navigate to={adminData?.role === 'super_admin' ? '/super-admin/dashboard' : '/admin/dashboard'} replace />
+            <Navigate to={adminData?.role === 'super_admin' ? '/super-admin/admins' : '/admin/customers'} replace />
           )
         } 
       />
@@ -40,8 +36,7 @@ const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
           )
         }
       >
-        <Route path="dashboard" element={<SuperAdminDashboard adminData={adminData} />} />
-        <Route path="" element={<Navigate to="dashboard" replace />} />
+        <Route path="" element={<Navigate to="admins" replace />} />
         <Route path="admins" element={<AdminManagement />} />
         <Route path="deleted-customers" element={<DeletedCustomers/>} />
         <Route path="deleted-life-insurance" element={<DeletedLifeInsurancePolicies/>} />
@@ -58,80 +53,9 @@ const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
           )
         }
       >
-        <Route path="dashboard" element={<AdminDashboard adminData={adminData} />} />
-        <Route path="" element={<Navigate to="dashboard" replace />} />
+        <Route path="" element={<Navigate to="customers" replace />} />
         <Route path="customers" element={<CustomerManagement />} />
         <Route path="life-insurance" element={<LifeInsuranceManagement />} />
-        <Route 
-          path="applications" 
-          element={
-            <ComingSoon 
-              title="Applications" 
-              description="Manage and track all customer applications, submissions, and processing status."
-              icon={FileText}
-            />
-          } 
-        />
-        <Route 
-          path="consultants" 
-          element={
-            <ComingSoon 
-              title="Consultants" 
-              description="Manage consultant profiles, assignments, and performance tracking."
-              icon={UserCheck}
-            />
-          } 
-        />
-        <Route 
-          path="reports" 
-          element={
-            <ComingSoon 
-              title="Reports" 
-              description="Generate detailed analytics, performance reports, and business insights."
-              icon={BarChart3}
-            />
-          } 
-        />
-        <Route 
-          path="database" 
-          element={
-            <ComingSoon 
-              title="Database" 
-              description="Advanced data management, backup, and system configuration tools."
-              icon={Database}
-            />
-          } 
-        />
-        <Route 
-          path="notifications" 
-          element={
-            <ComingSoon 
-              title="Notifications" 
-              description="Manage system notifications, alerts, and communication preferences."
-              icon={Bell}
-            />
-          } 
-        />
-        <Route 
-          path="settings" 
-          element={
-            <ComingSoon 
-              title="Settings" 
-              description="Configure system settings, user preferences, and security options."
-              icon={Settings}
-            />
-          } 
-        />
-        <Route 
-          path="help" 
-          element={
-            <ComingSoon 
-              title="Help" 
-              description="Access documentation, tutorials, and support resources."
-              icon={HelpCircle}
-            />
-          } 
-        />
       </Route>
 
       {/* Default redirect */}
@@ -139,7 +63,7 @@ const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
         path="/" 
         element={
           isLoggedIn ? (
-            <Navigate to={adminData?.role === 'super_admin' ? '/super-admin/dashboard' : '/admin/dashboard'} replace />
+            <Navigate to={adminData?.role === 'super_admin' ? '/super-admin/admins' : '/admin/customers'} replace />
           ) : (
             <Navigate to="/login" replace />
           )
@@ -151,7 +75,7 @@ const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
         path="*" 
         element={
           isLoggedIn ? (
-            <Navigate to={adminData?.role === 'super_admin' ? '/super-admin/dashboard' : '/admin/dashboard'} replace />
+            <Navigate to={adminData?.role === 'super_admin' ? '/super-admin/admins' : '/admin/customers'} replace />
           ) : (
             <Navigate to="/login" replace />
           )

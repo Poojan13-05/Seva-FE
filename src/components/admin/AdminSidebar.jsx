@@ -4,15 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
-  LayoutDashboard,
   Users,
-  FileText,
-  Settings,
-  UserCheck,
-  Database,
-  BarChart3,
-  Bell,
-  HelpCircle,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -20,12 +12,6 @@ import {
 } from 'lucide-react';
 
 const sidebarItems = [
-  {
-    title: "Dashboard",
-    icon: LayoutDashboard,
-    href: "/admin/dashboard",
-    color: "text-white"
-  },
   {
     title: "Customers",
     icon: Users,
@@ -37,53 +23,10 @@ const sidebarItems = [
     icon: Shield,
     href: "/admin/life-insurance",
     color: "text-white"
-  },
-  {
-    title: "Applications",
-    icon: FileText,
-    href: "/admin/applications",
-    color: "text-white"
-  },
-  {
-    title: "Consultants",
-    icon: UserCheck,
-    href: "/admin/consultants",
-    color: "text-white"
-  },
-  {
-    title: "Reports",
-    icon: BarChart3,
-    href: "/admin/reports",
-    color: "text-white"
-  },
-  {
-    title: "Database",
-    icon: Database,
-    href: "/admin/database",
-    color: "text-white"
   }
 ];
 
-const bottomItems = [
-  {
-    title: "Notifications",
-    icon: Bell,
-    href: "/admin/notifications",
-    color: "text-white"
-  },
-  {
-    title: "Settings",
-    icon: Settings,
-    href: "/admin/settings",
-    color: "text-white"
-  },
-  {
-    title: "Help",
-    icon: HelpCircle,
-    href: "/admin/help",
-    color: "text-white"
-  }
-];
+const bottomItems = [];
 
 const AdminSidebar = ({ adminData, onLogout, collapsed, setCollapsed }) => {
   const location = useLocation();
@@ -141,28 +84,6 @@ const AdminSidebar = ({ adminData, onLogout, collapsed, setCollapsed }) => {
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1">
         {sidebarItems.map((item, index) => {
-          const Icon = item.icon;
-          const isActive = location.pathname === item.href;
-          
-          return (
-            <Link
-              key={index}
-              to={item.href}
-              className={cn(
-                "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                "text-gray-300 hover:text-white hover:bg-white/10 ",
-                collapsed && "justify-center"
-              )}
-            >
-              <Icon className={cn("h-5 w-5", item.color)} />
-              {!collapsed && <span>{item.title}</span>}
-            </Link>
-          );
-        })}
-        
-        <Separator className="my-4 bg-white/20" />
-        
-        {bottomItems.map((item, index) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.href;
           

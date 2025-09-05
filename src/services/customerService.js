@@ -215,8 +215,42 @@ export const customerService = {
   // Export customers to Excel
   exportCustomers: async () => {
     try {
-      const response = await api.get('/customers/export');
-      return response.data;
+      const response = await api.get('/customers/export', {
+        responseType: 'blob', // Important: Handle as blob for file download
+        headers: {
+          'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        }
+      });
+
+      // Create blob URL and trigger download
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+
+      // Extract filename from response headers or use default
+      const contentDisposition = response.headers['content-disposition'];
+      let fileName = `customers_export_${new Date().toISOString().split('T')[0]}.xlsx`;
+      
+      if (contentDisposition) {
+        const fileNameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        if (fileNameMatch && fileNameMatch[1]) {
+          fileName = fileNameMatch[1].replace(/['"]/g, '');
+        }
+      }
+
+      // Create download link and trigger download
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+
+      return { success: true, fileName, message: 'Excel file downloaded successfully' };
     } catch (error) {
       console.error('Error exporting customers:', error);
       throw error.response?.data || error;

@@ -23,8 +23,6 @@ import {
   Eye,
   Edit,
   Trash2,
-  ToggleLeft,
-  ToggleRight,
   ExternalLink,
   User,
   Building2
@@ -34,8 +32,7 @@ const LifeInsuranceTable = ({
   policies = [], 
   onView, 
   onEdit, 
-  onDelete, 
-  onToggleStatus 
+  onDelete
 }) => {
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -223,7 +220,7 @@ const LifeInsuranceTable = ({
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="h-8 w-8 p-0 hover:bg-gray-100 focus:bg-gray-100 cursor-pointer"
+                        className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-white/10"
                       >
                         <MoreHorizontal className="w-4 h-4" />
                         <span className="sr-only">Open menu</span>
@@ -259,23 +256,6 @@ const LifeInsuranceTable = ({
                       
                       <DropdownMenuSeparator />
                       
-                      <DropdownMenuItem 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          onToggleStatus?.(policy._id, !policy.isActive);
-                        }}
-                        className="cursor-pointer text-gray-300 hover:text-white"
-                      >
-                        {policy.isActive ? (
-                          <ToggleLeft className="w-4 h-4 mr-2" />
-                        ) : (
-                          <ToggleRight className="w-4 h-4 mr-2" />
-                        )}
-                        {policy.isActive ? 'Deactivate' : 'Activate'}
-                      </DropdownMenuItem>
-                      
-                      <DropdownMenuSeparator />
                       
                       <DropdownMenuItem 
                         onClick={(e) => {

@@ -40,7 +40,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
-  ChevronsRight
+  ChevronsRight,
+  Undo2
 } from 'lucide-react';
 import { superAdminService } from '@/services/adminService';
 
@@ -61,7 +62,9 @@ const DeletedCustomers = () => {
     limit: 10
   });
   const [deletingCustomerId, setDeletingCustomerId] = useState(null);
+  const [recoveringCustomerId, setRecoveringCustomerId] = useState(null);
   const [confirmDeleteDialog, setConfirmDeleteDialog] = useState({ open: false, customer: null });
+  const [confirmRecoverDialog, setConfirmRecoverDialog] = useState({ open: false, customer: null });
 
   // Fetch deleted customers
   const fetchDeletedCustomers = async (page = 1) => {
@@ -104,6 +107,11 @@ const DeletedCustomers = () => {
     setConfirmDeleteDialog({ open: true, customer });
   };
 
+  // Handle recover
+  const handleRecover = async (customer) => {
+    setConfirmRecoverDialog({ open: true, customer });
+  };
+
   // Confirm permanent deletion
   const confirmPermanentDelete = async () => {
     const customer = confirmDeleteDialog.customer;
@@ -126,6 +134,31 @@ const DeletedCustomers = () => {
       toast.error('Failed to permanently delete customer');
     } finally {
       setDeletingCustomerId(null);
+    }
+  };
+
+  // Confirm recover
+  const confirmRecover = async () => {
+    const customer = confirmRecoverDialog.customer;
+    if (!customer) return;
+
+    try {
+      setRecoveringCustomerId(customer._id);
+      const response = await superAdminService.recoverCustomer(customer._id);
+      
+      if (response.success) {
+        toast.success('Customer recovered successfully');
+        fetchDeletedCustomers(pagination.currentPage);
+        fetchDeletedCustomerStats();
+        setConfirmRecoverDialog({ open: false, customer: null });
+      } else {
+        toast.error('Failed to recover customer');
+      }
+    } catch (error) {
+      console.error('Error recovering customer:', error);
+      toast.error('Failed to recover customer');
+    } finally {
+      setRecoveringCustomerId(null);
     }
   };
 
@@ -436,19 +469,34 @@ const DeletedCustomers = () => {
                         {customer.lastUpdatedBy?.name || 'N/A'}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button 
-                          variant="destructive" 
-                          size="sm"
-                          onClick={() => handlePermanentDelete(customer)}
-                          disabled={deletingCustomerId === customer._id}
-                          className="bg-red-600/20 hover:bg-red-600/30 text-red-400 border-red-400/30"
-                        >
-                          {deletingCustomerId === customer._id ? (
-                            <RefreshCw className="h-3 w-3 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-3 w-3" />
-                          )}
-                        </Button>
+                        <div className="flex items-center justify-end space-x-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleRecover(customer)}
+                            disabled={recoveringCustomerId === customer._id || deletingCustomerId === customer._id}
+                            className="bg-green-600/20 hover:bg-green-600/30 text-green-400 border-green-400/30"
+                          >
+                            {recoveringCustomerId === customer._id ? (
+                              <RefreshCw className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Undo2 className="h-3 w-3" />
+                            )}
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => handlePermanentDelete(customer)}
+                            disabled={deletingCustomerId === customer._id || recoveringCustomerId === customer._id}
+                            className="bg-red-600/20 hover:bg-red-600/30 text-red-400 border-red-400/30"
+                          >
+                            {deletingCustomerId === customer._id ? (
+                              <RefreshCw className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-3 w-3" />
+                            )}
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -537,7 +585,9 @@ const DeletedCustomers = () => {
         </Card>
       )}
 
-      {/* Confirmation Dialog */}
+      {/* Confirmation Dialogs */}
+      
+      {/* Permanent Delete Dialog */}
       <Dialog open={confirmDeleteDialog.open} onOpenChange={(open) => setConfirmDeleteDialog({ open, customer: null })}>
         <DialogContent className="bg-white/10 backdrop-blur-md border-white/20">
           <DialogHeader>
@@ -585,6 +635,63 @@ const DeletedCustomers = () => {
                 </>
               ) : (
                 'Yes, Delete Permanently'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Recover Dialog */}
+      <Dialog open={confirmRecoverDialog.open} onOpenChange={(open) => setConfirmRecoverDialog({ open, customer: null })}>
+        <DialogContent className="bg-white/10 backdrop-blur-md border-white/20">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-white">
+              <Undo2 className="h-5 w-5 text-green-400 mr-2" />
+              Recover Customer
+            </DialogTitle>
+            <DialogDescription className="space-y-2 text-gray-300">
+              {confirmRecoverDialog.customer && (
+                <>
+                  <p>
+                    This will recover customer <strong className="text-white">{confirmRecoverDialog.customer.customerId}</strong> and restore:
+                  </p>
+                  <ul className="list-disc list-inside text-sm space-y-1 ml-4">
+                    <li>Customer profile and personal information</li>
+                    <li>All uploaded documents ({(confirmRecoverDialog.customer.documents?.length || 0) + (confirmRecoverDialog.customer.additionalDocuments?.length || 0)} files)</li>
+                    <li>Customer will be moved back to the active customers list</li>
+                    <li>All data will be fully restored</li>
+                  </ul>
+                  <p className="text-green-400 font-medium">
+                    Are you sure you want to recover this customer?
+                  </p>
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setConfirmRecoverDialog({ open: false, customer: null })}
+              className="border-white/30 text-gray-300 hover:text-white hover:bg-white/10"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="outline"
+              onClick={confirmRecover}
+              disabled={recoveringCustomerId !== null}
+              className="bg-green-600/20 hover:bg-green-600/30 text-green-400 border-green-400/30"
+            >
+              {recoveringCustomerId ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Recovering...
+                </>
+              ) : (
+                <>
+                  <Undo2 className="h-4 w-4 mr-2" />
+                  Yes, Recover Customer
+                </>
               )}
             </Button>
           </DialogFooter>

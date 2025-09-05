@@ -27,8 +27,6 @@ import {
   Edit,
   Trash2,
   Eye,
-  UserCheck,
-  UserX,
   Calendar,
   Mail,
   Phone,
@@ -38,12 +36,11 @@ import {
   MapPin,
   CreditCard
 } from 'lucide-react';
-import { useCustomers, useToggleCustomerStatus, useDeleteCustomer } from '@/hooks/useCustomer';
+import { useCustomers, useDeleteCustomer } from '@/hooks/useCustomer';
 import { format } from 'date-fns';
 
 const CustomerTable = ({ filters, selectedCustomers, setSelectedCustomers, onViewCustomer, onEditCustomer }) => {
   const { data, isLoading, error } = useCustomers(filters);
-  const toggleStatusMutation = useToggleCustomerStatus();
   const deleteCustomerMutation = useDeleteCustomer();
 
   const customers = data?.data?.customers || [];
@@ -64,15 +61,6 @@ const CustomerTable = ({ filters, selectedCustomers, setSelectedCustomers, onVie
       setSelectedCustomers(prev => [...prev, customerId]);
     } else {
       setSelectedCustomers(prev => prev.filter(id => id !== customerId));
-    }
-  };
-
-  // Handle toggle status
-  const handleToggleStatus = async (customerId) => {
-    try {
-      await toggleStatusMutation.mutateAsync(customerId);
-    } catch (error) {
-      console.error('Error toggling status:', error);
     }
   };
 
@@ -371,25 +359,6 @@ const CustomerTable = ({ filters, selectedCustomers, setSelectedCustomers, onVie
                         Edit Customer
                       </DropdownMenuItem>
                       
-                      <DropdownMenuItem 
-                        onClick={() => handleToggleStatus(customer._id)}
-                        disabled={toggleStatusMutation.isPending}
-                        className="text-gray-300 hover:text-white hover:bg-white/10 cursor-pointer"
-                      >
-                        {customer.isActive ? (
-                          <>
-                            <UserX className="mr-2 h-4 w-4" />
-                            Deactivate
-                          </>
-                        ) : (
-                          <>
-                            <UserCheck className="mr-2 h-4 w-4" />
-                            Activate
-                          </>
-                        )}
-                      </DropdownMenuItem>
-                      
-                      <DropdownMenuSeparator className="bg-white/20" />
                       
                       <DropdownMenuItem 
                         onClick={() => handleDeleteCustomer(customer._id)}

@@ -390,7 +390,9 @@ const LifeInsuranceFormStyled = ({
     }
   };
 
-  // No validation - removed getFieldError function
+  const getFieldError = (section, field) => {
+    return errors[section]?.[field];
+  };
 
   return (
     <form id="life-insurance-form" onSubmit={handleSubmit} className="space-y-6">
@@ -443,7 +445,8 @@ const LifeInsuranceFormStyled = ({
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="customer" className="text-white">
-                    Client Name                  </Label>
+                    Client Name <span className="text-red-400">*</span>
+                  </Label>
                   <Select
                     value={formData.clientDetails.customer || ''}
                     onValueChange={(value) => handleInputChange('clientDetails', 'customer', value)}
@@ -465,11 +468,15 @@ const LifeInsuranceFormStyled = ({
                       )}
                     </SelectContent>
                   </Select>
+                  {getFieldError('clientDetails', 'customer') && (
+                    <p className="text-red-400 text-sm">{getFieldError('clientDetails', 'customer')}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="insuredName" className="text-white">
-                    Insured Name                  </Label>
+                    Insured Name <span className="text-red-400">*</span>
+                  </Label>
                   <Input
                     id="insuredName"
                     value={formData.clientDetails.insuredName}
@@ -477,6 +484,9 @@ const LifeInsuranceFormStyled = ({
                     placeholder="Enter insured name"
                     className="bg-white/10 border-white/30 text-white placeholder-gray-400"
                   />
+                  {getFieldError('clientDetails', 'insuredName') && (
+                    <p className="text-red-400 text-sm">{getFieldError('clientDetails', 'insuredName')}</p>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -499,7 +509,8 @@ const LifeInsuranceFormStyled = ({
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="insuranceCompany" className="text-white">
-                    Insurance Company                  </Label>
+                    Insurance Company <span className="text-red-400">*</span>
+                  </Label>
                   <Select
                     value={formData.insuranceDetails.insuranceCompany}
                     onValueChange={(value) => handleInputChange('insuranceDetails', 'insuranceCompany', value)}
@@ -515,6 +526,9 @@ const LifeInsuranceFormStyled = ({
                       ))}
                     </SelectContent>
                   </Select>
+                  {getFieldError('insuranceDetails', 'insuranceCompany') && (
+                    <p className="text-red-400 text-sm">{getFieldError('insuranceDetails', 'insuranceCompany')}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -561,7 +575,8 @@ const LifeInsuranceFormStyled = ({
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="policyNumber" className="text-white">
-                    Policy Number                  </Label>
+                    Policy Number <span className="text-red-400">*</span>
+                  </Label>
                   <Input
                     id="policyNumber"
                     value={formData.insuranceDetails.policyNumber}
@@ -569,6 +584,9 @@ const LifeInsuranceFormStyled = ({
                     placeholder="Enter policy number"
                     className="bg-white/10 border-white/30 text-white placeholder-gray-400"
                   />
+                  {getFieldError('insuranceDetails', 'policyNumber') && (
+                    <p className="text-red-400 text-sm">{getFieldError('insuranceDetails', 'policyNumber')}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -819,7 +837,8 @@ const LifeInsuranceFormStyled = ({
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="nomineeName" className="text-white">
-                    Nominee Name                  </Label>
+                    Nominee Name <span className="text-red-400">*</span>
+                  </Label>
                   <Input
                     id="nomineeName"
                     value={formData.nomineeDetails.nomineeName}
@@ -827,6 +846,9 @@ const LifeInsuranceFormStyled = ({
                     placeholder="Enter nominee name"
                     className="bg-white/10 border-white/30 text-white placeholder-gray-400"
                   />
+                  {getFieldError('nomineeDetails', 'nomineeName') && (
+                    <p className="text-red-400 text-sm">{getFieldError('nomineeDetails', 'nomineeName')}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -1133,12 +1155,22 @@ const LifeInsuranceFormStyled = ({
 
                         <div className="space-y-2">
                           <Label className="text-white">Upload File</Label>
-                          <input
-                            type="file"
-                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                            onChange={(e) => handleDocumentFileChange(e.target.files[0], index)}
-                            className="w-full text-sm border border-white/30 rounded-md p-2 bg-white/10 text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                          />
+                          <div className="border-2 border-dashed border-white/30 rounded-lg p-2 bg-white/5 h-10">
+                            <input
+                              id={`documentFile-${index}`}
+                              type="file"
+                              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                              onChange={(e) => handleDocumentFileChange(e.target.files[0], index)}
+                              className="hidden"
+                            />
+                            <label
+                              htmlFor={`documentFile-${index}`}
+                              className="flex items-center justify-center cursor-pointer h-full"
+                            >
+                              <Upload className="w-4 h-4 text-gray-400 mr-2" />
+                              <p className="text-sm text-white">Click to upload</p>
+                            </label>
+                          </div>
                         </div>
                       </div>
 

@@ -178,6 +178,17 @@ export const superAdminService = {
     }
   },
 
+  // Recover customer
+  recoverCustomer: async (customerId) => {
+    try {
+      const response = await api.patch(`/super-admin/customers/${customerId}/recover`);
+      return response.data;
+    } catch (error) {
+      console.error('Error recovering customer:', error);
+      throw error.response?.data || error;
+    }
+  },
+
   // Get deleted life insurance policies
   getDeletedLifeInsurancePolicies: async (params = {}) => {
     try {
@@ -227,6 +238,17 @@ export const superAdminService = {
       return response.data;
     } catch (error) {
       console.error('Error permanently deleting life insurance policy:', error);
+      throw error.response?.data || error;
+    }
+  },
+
+  // Recover life insurance policy
+  recoverLifeInsurancePolicy: async (policyId) => {
+    try {
+      const response = await api.patch(`/super-admin/life-insurance/${policyId}/recover`);
+      return response.data;
+    } catch (error) {
+      console.error('Error recovering life insurance policy:', error);
       throw error.response?.data || error;
     }
   }

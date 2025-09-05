@@ -37,8 +37,7 @@ import ViewLifeInsuranceDialog from '@/components/admin/ViewLifeInsuranceDialog'
 import {
   useLifeInsurancePolicies,
   useLifeInsuranceListState,
-  useDeleteLifeInsurance,
-  useToggleLifeInsuranceStatus
+  useDeleteLifeInsurance
 } from '@/hooks/useLifeInsurance';
 
 // Services
@@ -61,7 +60,6 @@ const LifeInsuranceManagement = () => {
 
   // Mutation hooks
   const deletePolicy = useDeleteLifeInsurance();
-  const toggleStatus = useToggleLifeInsuranceStatus();
 
   // Data
   const policies = policiesData?.data?.lifeInsurancePolicies || [];
@@ -90,14 +88,6 @@ const LifeInsuranceManagement = () => {
       } catch (error) {
         // Error handling is done by the hook
       }
-    }
-  };
-
-  const handleToggleStatus = async (policyId, newStatus) => {
-    try {
-      await toggleStatus.mutateAsync(policyId);
-    } catch (error) {
-      // Error handling is done by the hook
     }
   };
 
@@ -295,7 +285,6 @@ const LifeInsuranceManagement = () => {
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
-                onToggleStatus={handleToggleStatus}
               />
 
               {/* Pagination */}

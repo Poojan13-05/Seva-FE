@@ -156,8 +156,8 @@ export const useExportCustomers = () => {
   return useMutation({
     mutationFn: customerService.exportCustomers,
     onSuccess: (data) => {
-      // Handle the export data - could trigger download
-      toast.success('Customer data exported successfully');
+      // Handle the export data - file should already be downloaded
+      toast.success(`Excel file "${data.fileName}" downloaded successfully`);
     },
     onError: (error) => {
       const message = error.message || 'Failed to export customer data';

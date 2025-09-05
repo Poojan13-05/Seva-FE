@@ -42,7 +42,8 @@ import {
   Building2,
   TrendingUp,
   Calendar,
-  Users
+  Users,
+  Undo2
 } from 'lucide-react';
 import { superAdminService } from '@/services/adminService';
 import { lifeInsuranceService } from '@/services/lifeInsuranceService';
@@ -65,7 +66,9 @@ const DeletedLifeInsurancePolicies = () => {
     limit: 10
   });
   const [deletingPolicyId, setDeletingPolicyId] = useState(null);
+  const [recoveringPolicyId, setRecoveringPolicyId] = useState(null);
   const [confirmDeleteDialog, setConfirmDeleteDialog] = useState({ open: false, policy: null });
+  const [confirmRecoverDialog, setConfirmRecoverDialog] = useState({ open: false, policy: null });
 
   // Fetch deleted policies
   const fetchDeletedPolicies = async (page = 1) => {
@@ -108,6 +111,11 @@ const DeletedLifeInsurancePolicies = () => {
     setConfirmDeleteDialog({ open: true, policy });
   };
 
+  // Handle recover
+  const handleRecover = async (policy) => {
+    setConfirmRecoverDialog({ open: true, policy });
+  };
+
   // Confirm permanent deletion
   const confirmPermanentDelete = async () => {
     const policy = confirmDeleteDialog.policy;
@@ -130,6 +138,31 @@ const DeletedLifeInsurancePolicies = () => {
       toast.error('Failed to permanently delete life insurance policy');
     } finally {
       setDeletingPolicyId(null);
+    }
+  };
+
+  // Confirm recover
+  const confirmRecover = async () => {
+    const policy = confirmRecoverDialog.policy;
+    if (!policy) return;
+
+    try {
+      setRecoveringPolicyId(policy._id);
+      const response = await superAdminService.recoverLifeInsurancePolicy(policy._id);
+      
+      if (response.success) {
+        toast.success('Life insurance policy recovered successfully');
+        fetchDeletedPolicies(pagination.currentPage);
+        fetchDeletedPolicyStats();
+        setConfirmRecoverDialog({ open: false, policy: null });
+      } else {
+        toast.error('Failed to recover life insurance policy');
+      }
+    } catch (error) {
+      console.error('Error recovering policy:', error);
+      toast.error('Failed to recover life insurance policy');
+    } finally {
+      setRecoveringPolicyId(null);
     }
   };
 
@@ -472,19 +505,34 @@ const DeletedLifeInsurancePolicies = () => {
                         {policy.lastUpdatedBy?.name || 'N/A'}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button 
-                          variant="destructive" 
-                          size="sm"
-                          onClick={() => handlePermanentDelete(policy)}
-                          disabled={deletingPolicyId === policy._id}
-                          className="bg-red-600/20 hover:bg-red-600/30 text-red-400 border-red-400/30"
-                        >
-                          {deletingPolicyId === policy._id ? (
-                            <RefreshCw className="h-3 w-3 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-3 w-3" />
-                          )}
-                        </Button>
+                        <div className="flex items-center justify-end space-x-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleRecover(policy)}
+                            disabled={recoveringPolicyId === policy._id || deletingPolicyId === policy._id}
+                            className="bg-green-600/20 hover:bg-green-600/30 text-green-400 border-green-400/30"
+                          >
+                            {recoveringPolicyId === policy._id ? (
+                              <RefreshCw className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Undo2 className="h-3 w-3" />
+                            )}
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => handlePermanentDelete(policy)}
+                            disabled={deletingPolicyId === policy._id || recoveringPolicyId === policy._id}
+                            className="bg-red-600/20 hover:bg-red-600/30 text-red-400 border-red-400/30"
+                          >
+                            {deletingPolicyId === policy._id ? (
+                              <RefreshCw className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-3 w-3" />
+                            )}
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -573,7 +621,9 @@ const DeletedLifeInsurancePolicies = () => {
         </Card>
       )}
 
-      {/* Confirmation Dialog */}
+      {/* Confirmation Dialogs */}
+      
+      {/* Permanent Delete Dialog */}
       <Dialog open={confirmDeleteDialog.open} onOpenChange={(open) => setConfirmDeleteDialog({ open, policy: null })}>
         <DialogContent className="bg-white/10 backdrop-blur-md border-white/20">
           <DialogHeader>
@@ -621,6 +671,63 @@ const DeletedLifeInsurancePolicies = () => {
                 </>
               ) : (
                 'Yes, Delete Permanently'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Recover Dialog */}
+      <Dialog open={confirmRecoverDialog.open} onOpenChange={(open) => setConfirmRecoverDialog({ open, policy: null })}>
+        <DialogContent className="bg-white/10 backdrop-blur-md border-white/20">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-white">
+              <Undo2 className="h-5 w-5 text-green-400 mr-2" />
+              Recover Life Insurance Policy
+            </DialogTitle>
+            <DialogDescription className="space-y-2 text-gray-300">
+              {confirmRecoverDialog.policy && (
+                <>
+                  <p>
+                    This will recover policy <strong className="text-white">{confirmRecoverDialog.policy.insuranceDetails?.policyNumber}</strong> and restore:
+                  </p>
+                  <ul className="list-disc list-inside text-sm space-y-1 ml-4">
+                    <li>Policy details and client information</li>
+                    <li>All uploaded documents ({((confirmRecoverDialog.policy.uploadPolicy?.policyFileUrl ? 1 : 0) + (confirmRecoverDialog.policy.uploadDocuments?.length || 0))} files)</li>
+                    <li>Policy will be moved back to the active policies list</li>
+                    <li>All data will be fully restored</li>
+                  </ul>
+                  <p className="text-green-400 font-medium">
+                    Are you sure you want to recover this policy?
+                  </p>
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setConfirmRecoverDialog({ open: false, policy: null })}
+              className="border-white/30 text-gray-300 hover:text-white hover:bg-white/10"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="outline"
+              onClick={confirmRecover}
+              disabled={recoveringPolicyId !== null}
+              className="bg-green-600/20 hover:bg-green-600/30 text-green-400 border-green-400/30"
+            >
+              {recoveringPolicyId ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Recovering...
+                </>
+              ) : (
+                <>
+                  <Undo2 className="h-4 w-4 mr-2" />
+                  Yes, Recover Policy
+                </>
               )}
             </Button>
           </DialogFooter>
