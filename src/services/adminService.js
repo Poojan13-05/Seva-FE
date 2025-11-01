@@ -251,5 +251,69 @@ export const superAdminService = {
       console.error('Error recovering life insurance policy:', error);
       throw error.response?.data || error;
     }
+  },
+
+  // Get deleted health insurance policies
+  getDeletedHealthInsurancePolicies: async (params = {}) => {
+    try {
+      const {
+        page = 1,
+        limit = 10,
+        search = '',
+        insuranceCompany = 'all',
+        policyType = 'all',
+        sortBy = 'updatedAt',
+        sortOrder = 'desc'
+      } = params;
+
+      const response = await api.get('/super-admin/health-insurance/deleted', {
+        params: {
+          page,
+          limit,
+          search,
+          insuranceCompany,
+          policyType,
+          sortBy,
+          sortOrder
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching deleted health insurance policies:', error);
+      throw error.response?.data || error;
+    }
+  },
+
+  // Get deleted health insurance statistics
+  getDeletedHealthInsuranceStats: async () => {
+    try {
+      const response = await api.get('/super-admin/health-insurance/deleted/stats');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching deleted health insurance stats:', error);
+      throw error.response?.data || error;
+    }
+  },
+
+  // Permanently delete health insurance policy
+  permanentlyDeleteHealthInsurancePolicy: async (policyId) => {
+    try {
+      const response = await api.delete(`/super-admin/health-insurance/${policyId}/permanent`);
+      return response.data;
+    } catch (error) {
+      console.error('Error permanently deleting health insurance policy:', error);
+      throw error.response?.data || error;
+    }
+  },
+
+  // Recover health insurance policy
+  recoverHealthInsurancePolicy: async (policyId) => {
+    try {
+      const response = await api.patch(`/super-admin/health-insurance/${policyId}/recover`);
+      return response.data;
+    } catch (error) {
+      console.error('Error recovering health insurance policy:', error);
+      throw error.response?.data || error;
+    }
   }
 };

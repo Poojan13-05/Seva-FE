@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from '@/routes/AppRoutes';
 import { useAuthState, useLogout } from '@/hooks/useAuth';
+import { Toaster } from '@/components/ui/sonner';
 
 function App() {
   // Get authentication state from our custom hook
@@ -26,10 +27,16 @@ function App() {
 
   return (
     <BrowserRouter>
-      <AppRoutes 
+      <AppRoutes
         isLoggedIn={isAuthenticated}
         adminData={adminData}
         onLogout={handleLogout}
+      />
+      <Toaster
+        position="top-right"
+        richColors
+        closeButton
+        expand={false}
       />
     </BrowserRouter>
   );

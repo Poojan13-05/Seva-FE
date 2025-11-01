@@ -11,11 +11,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Pagination } from "@/components/ui/pagination";
 import { Separator } from "@/components/ui/separator";
-import { 
+import {
   Plus,
   Search,
   Filter,
@@ -23,7 +31,8 @@ import {
   Download,
   Shield,
   AlertCircle,
-  Loader2
+  Loader2,
+  AlertTriangle
 } from "lucide-react";
 
 // Components
@@ -48,7 +57,9 @@ const LifeInsuranceManagement = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState(null);
+  const [policyToDelete, setPolicyToDelete] = useState(null);
 
   // Query hooks
   const {
@@ -81,13 +92,20 @@ const LifeInsuranceManagement = () => {
     setEditDialogOpen(true);
   };
 
-  const handleDelete = async (policyId) => {
-    if (window.confirm('Are you sure you want to delete this life insurance policy? This action cannot be undone.')) {
-      try {
-        await deletePolicy.mutateAsync(policyId);
-      } catch (error) {
-        // Error handling is done by the hook
-      }
+  const handleDelete = (policy) => {
+    setPolicyToDelete(policy);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!policyToDelete) return;
+
+    try {
+      await deletePolicy.mutateAsync(policyToDelete._id);
+      setDeleteDialogOpen(false);
+      setPolicyToDelete(null);
+    } catch (error) {
+      // Error handling is done by the hook
     }
   };
 
@@ -320,6 +338,58 @@ const LifeInsuranceManagement = () => {
         onOpenChange={setViewDialogOpen}
         policy={selectedPolicy}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent className="bg-white/10 backdrop-blur-md border-white/20">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-white">
+              <AlertTriangle className="h-5 w-5 text-red-400 mr-2" />
+              Delete Life Insurance Policy
+            </DialogTitle>
+            <DialogDescription className="space-y-2 text-gray-300">
+              {policyToDelete && (
+                <>
+                  <p>
+                    Are you sure you want to delete policy <strong className="text-white">{policyToDelete.insuranceDetails?.policyNumber}</strong>?
+                  </p>
+                  <p className="text-sm">
+                    This will mark the policy as inactive. The policy can be recovered by a super admin if needed.
+                  </p>
+                  <p className="text-red-400 font-medium">
+                    This action will remove the policy from the active policies list.
+                  </p>
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={deletePolicy.isPending}
+              className="border-white/30 text-gray-300 hover:text-white hover:bg-white/10"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={deletePolicy.isPending}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {deletePolicy.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                'Delete Policy'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

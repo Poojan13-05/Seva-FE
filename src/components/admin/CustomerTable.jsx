@@ -16,6 +16,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -34,7 +42,8 @@ import {
   Building2,
   User,
   MapPin,
-  CreditCard
+  CreditCard,
+  Loader2
 } from 'lucide-react';
 import { useCustomers, useDeleteCustomer } from '@/hooks/useCustomer';
 import { format } from 'date-fns';
@@ -42,6 +51,8 @@ import { format } from 'date-fns';
 const CustomerTable = ({ filters, selectedCustomers, setSelectedCustomers, onViewCustomer, onEditCustomer }) => {
   const { data, isLoading, error } = useCustomers(filters);
   const deleteCustomerMutation = useDeleteCustomer();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [customerToDelete, setCustomerToDelete] = useState(null);
 
   const customers = data?.data?.customers || [];
   const pagination = data?.data?.pagination;
@@ -65,15 +76,22 @@ const CustomerTable = ({ filters, selectedCustomers, setSelectedCustomers, onVie
   };
 
   // Handle delete customer
-  const handleDeleteCustomer = async (customerId) => {
-    if (window.confirm('Are you sure you want to delete this customer? This action cannot be undone.')) {
-      try {
-        await deleteCustomerMutation.mutateAsync(customerId);
-        // Remove from selected if it was selected
-        setSelectedCustomers(prev => prev.filter(id => id !== customerId));
-      } catch (error) {
-        console.error('Error deleting customer:', error);
-      }
+  const handleDeleteCustomer = (customer) => {
+    setCustomerToDelete(customer);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!customerToDelete) return;
+
+    try {
+      await deleteCustomerMutation.mutateAsync(customerToDelete._id);
+      // Remove from selected if it was selected
+      setSelectedCustomers(prev => prev.filter(id => id !== customerToDelete._id));
+      setDeleteDialogOpen(false);
+      setCustomerToDelete(null);
+    } catch (error) {
+      console.error('Error deleting customer:', error);
     }
   };
 
@@ -360,8 +378,8 @@ const CustomerTable = ({ filters, selectedCustomers, setSelectedCustomers, onVie
                       </DropdownMenuItem>
                       
                       
-                      <DropdownMenuItem 
-                        onClick={() => handleDeleteCustomer(customer._id)}
+                      <DropdownMenuItem
+                        onClick={() => handleDeleteCustomer(customer)}
                         disabled={deleteCustomerMutation.isPending}
                         className="text-red-400 hover:text-red-300 hover:bg-red-500/10 cursor-pointer"
                       >
@@ -376,6 +394,64 @@ const CustomerTable = ({ filters, selectedCustomers, setSelectedCustomers, onVie
           })}
         </TableBody>
       </Table>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent className="bg-white/10 backdrop-blur-md border-white/20">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-white">
+              <AlertTriangle className="h-5 w-5 text-red-400 mr-2" />
+              Delete Customer
+            </DialogTitle>
+            <DialogDescription className="space-y-2 text-gray-300">
+              {customerToDelete && (
+                <>
+                  <p>
+                    Are you sure you want to delete customer{' '}
+                    <strong className="text-white">
+                      {customerToDelete.customerType === 'individual'
+                        ? `${customerToDelete.personalDetails?.firstName} ${customerToDelete.personalDetails?.lastName}`
+                        : customerToDelete.corporateDetails?.companyName}
+                    </strong>{' '}
+                    ({customerToDelete.customerId})?
+                  </p>
+                  <p className="text-sm">
+                    This will mark the customer as inactive. The customer can be recovered by a super admin if needed.
+                  </p>
+                  <p className="text-red-400 font-medium">
+                    This action will remove the customer from the active customers list.
+                  </p>
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={deleteCustomerMutation.isPending}
+              className="border-white/30 text-gray-300 hover:text-white hover:bg-white/10"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={deleteCustomerMutation.isPending}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {deleteCustomerMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                'Delete Customer'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

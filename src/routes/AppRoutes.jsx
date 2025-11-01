@@ -9,6 +9,7 @@ import HealthInsuranceManagement from '@/pages/Admin/HealthInsuranceManagement';
 import AdminManagement from '@/pages/SuperAdmin/AdminManagement';
 import DeletedCustomers from '@/pages/SuperAdmin/DeletedCustomers';
 import DeletedLifeInsurancePolicies from '@/pages/SuperAdmin/DeletedLifeInsurancePolicies';
+import DeletedHealthInsurancePolicies from '@/pages/SuperAdmin/DeletedHealthInsurancePolicies';
 
 
 const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
@@ -41,6 +42,7 @@ const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
         <Route path="admins" element={<AdminManagement />} />
         <Route path="deleted-customers" element={<DeletedCustomers/>} />
         <Route path="deleted-life-insurance" element={<DeletedLifeInsurancePolicies/>} />
+        <Route path="deleted-health-insurance" element={<DeletedHealthInsurancePolicies/>} />
       </Route>
 
       {/* Protected Routes - Admin */}

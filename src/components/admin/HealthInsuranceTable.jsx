@@ -264,7 +264,7 @@ const HealthInsuranceTable = ({
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          onDelete?.(policy._id);
+                          onDelete?.(policy);
                         }}
                         className="text-red-600 focus:text-red-600 hover:text-red-700 cursor-pointer"
                       >
