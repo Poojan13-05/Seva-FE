@@ -5,6 +5,7 @@ import SuperAdminLayout from '@/layouts/SuperAdminLayout';
 import AdminLayout from '@/layouts/AdminLayout';
 import CustomerManagement from '@/pages/Admin/CustomerManagement';
 import LifeInsuranceManagement from '@/pages/Admin/LifeInsuranceManagement';
+import HealthInsuranceManagement from '@/pages/Admin/HealthInsuranceManagement';
 import AdminManagement from '@/pages/SuperAdmin/AdminManagement';
 import DeletedCustomers from '@/pages/SuperAdmin/DeletedCustomers';
 import DeletedLifeInsurancePolicies from '@/pages/SuperAdmin/DeletedLifeInsurancePolicies';
@@ -56,6 +57,7 @@ const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
         <Route path="" element={<Navigate to="customers" replace />} />
         <Route path="customers" element={<CustomerManagement />} />
         <Route path="life-insurance" element={<LifeInsuranceManagement />} />
+        <Route path="health-insurance" element={<HealthInsuranceManagement />} />
       </Route>
 
       {/* Default redirect */}

@@ -69,12 +69,16 @@ export const useCustomerById = (customerId) => {
 };
 
 // Hook to get life insurance policy by ID
-export const useLifeInsurance = (policyId) => {
+export const useLifeInsurance = (policyId, options = {}) => {
   return useQuery({
     queryKey: lifeInsuranceKeys.detail(policyId),
     queryFn: () => lifeInsuranceService.getLifeInsuranceById(policyId),
     enabled: !!policyId,
     retry: 2,
+    staleTime: 0, // Always consider data stale
+    cacheTime: 0, // Don't cache the data
+    refetchOnMount: true, // Always refetch on mount
+    ...options,
     onError: (error) => {
       toast.error(error.message || 'Failed to fetch life insurance policy details');
     }

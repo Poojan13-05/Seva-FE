@@ -1,4 +1,4 @@
-// src/components/admin/EditLifeInsuranceDialog.jsx
+// src/components/admin/EditHealthInsuranceDialog.jsx
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -11,32 +11,36 @@ import {
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, AlertTriangle, Edit } from 'lucide-react';
-import { useUpdateLifeInsurance, useLifeInsurance } from '@/hooks/useLifeInsurance';
-import LifeInsuranceFormStyled from './LifeInsuranceFormStyled';
+import { useUpdateHealthInsurance, useHealthInsurance } from '@/hooks/useHealthInsurance';
+import HealthInsuranceForm from './HealthInsuranceForm';
 
-const EditLifeInsuranceDialog = ({ open, onOpenChange, policy }) => {
+const EditHealthInsuranceDialog = ({ open, onOpenChange, policy }) => {
   const [errors, setErrors] = useState({});
   const [resetForm, setResetForm] = useState(false);
-  const updateLifeInsurance = useUpdateLifeInsurance();
+  const updateHealthInsurance = useUpdateHealthInsurance();
 
   // Fetch full policy details with populated customer data
-  const { data: fullPolicyData, isLoading: isLoadingPolicy } = useLifeInsurance(
+  const { data: fullPolicyData, isLoading: isLoadingPolicy } = useHealthInsurance(
     open && policy?._id ? policy._id : null
   );
 
   // Use full policy data if available, otherwise fallback to provided policy
-  const policyToUse = fullPolicyData?.data?.lifeInsurance || policy;
+  const policyToUse = fullPolicyData?.data?.healthInsurance || policy;
 
   // Format customer data from policy for dropdown
   const selectedCustomer = React.useMemo(() => {
     if (!policyToUse?.clientDetails?.customer) return null;
+    
 
     const customer = policyToUse.clientDetails.customer;
 
     // Handle both populated and non-populated customer data
     if (typeof customer === 'string') {
+      // If customer is just an ID string, we can't format it properly
       return null;
     }
+
+   
 
     return {
       value: customer._id,
@@ -44,30 +48,26 @@ const EditLifeInsuranceDialog = ({ open, onOpenChange, policy }) => {
       email: customer.personalDetails?.email || ''
     };
   }, [policyToUse]);
-
+  
+ console.log(">>>>>>>>>>>>>>>HELLOOOO",selectedCustomer);
 
   const handleSubmit = async (formData, files, deletedFiles = {}) => {
     try {
       setErrors({});
 
-      // Validate required fields
+      // Validate only essential required fields
       const validationErrors = {};
 
-      // Validate client details
-      if (!formData.clientDetails?.customer || 
-          formData.clientDetails.customer === '' || 
-          formData.clientDetails.customer === null || 
+      // Validate client details - only customer is required
+      if (!formData.clientDetails?.customer ||
+          formData.clientDetails.customer === '' ||
+          formData.clientDetails.customer === null ||
           formData.clientDetails.customer === undefined) {
         validationErrors.clientDetails = validationErrors.clientDetails || {};
         validationErrors.clientDetails.customer = 'Please select a customer';
       }
 
-      if (!formData.clientDetails?.insuredName?.trim()) {
-        validationErrors.clientDetails = validationErrors.clientDetails || {};
-        validationErrors.clientDetails.insuredName = 'Insured name is required';
-      }
-
-      // Validate insurance details
+      // Validate insurance details - only company and policy number are required
       if (!formData.insuranceDetails?.insuranceCompany) {
         validationErrors.insuranceDetails = validationErrors.insuranceDetails || {};
         validationErrors.insuranceDetails.insuranceCompany = 'Insurance company is required';
@@ -78,18 +78,12 @@ const EditLifeInsuranceDialog = ({ open, onOpenChange, policy }) => {
         validationErrors.insuranceDetails.policyNumber = 'Policy number is required';
       }
 
-      // Validate nominee details  
-      if (!formData.nomineeDetails?.nomineeName?.trim()) {
-        validationErrors.nomineeDetails = validationErrors.nomineeDetails || {};
-        validationErrors.nomineeDetails.nomineeName = 'Nominee name is required';
-      }
-
       if (Object.keys(validationErrors).length > 0) {
         setErrors(validationErrors);
         return;
       }
 
-      await updateLifeInsurance.mutateAsync({
+      await updateHealthInsurance.mutateAsync({
         policyId: policyToUse._id,
         policyData: formData,
         files,
@@ -98,13 +92,13 @@ const EditLifeInsuranceDialog = ({ open, onOpenChange, policy }) => {
       onOpenChange(false);
     } catch (error) {
       setErrors({
-        general: error.message || 'Failed to update life insurance policy. Please try again.'
+        general: error.message || 'Failed to update health insurance policy. Please try again.'
       });
     }
   };
 
   const handleClose = () => {
-    if (!updateLifeInsurance.isPending) {
+    if (!updateHealthInsurance.isPending) {
       setErrors({});
       onOpenChange(false);
     }
@@ -126,7 +120,7 @@ const EditLifeInsuranceDialog = ({ open, onOpenChange, policy }) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Edit className="w-5 h-5" />
-              Edit Life Insurance Policy
+              Edit Health Insurance Policy
             </DialogTitle>
           </DialogHeader>
           <div className="flex items-center justify-center py-8">
@@ -144,10 +138,10 @@ const EditLifeInsuranceDialog = ({ open, onOpenChange, policy }) => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Edit className="w-5 h-5" />
-            Edit Life Insurance Policy
+            Edit Health Insurance Policy
           </DialogTitle>
           <DialogDescription>
-            Update the life insurance policy details for {policyToUse.insuranceDetails?.policyNumber || 'this policy'}.
+            Update the health insurance policy details for {policyToUse.insuranceDetails?.policyNumber || 'this policy'}.
           </DialogDescription>
         </DialogHeader>
 
@@ -159,11 +153,11 @@ const EditLifeInsuranceDialog = ({ open, onOpenChange, policy }) => {
         )}
 
         <div className="py-4">
-          <LifeInsuranceFormStyled
+          <HealthInsuranceForm
             key={`${policyToUse._id}-${selectedCustomer?.value || 'no-customer'}`}
             initialData={policyToUse}
             onSubmit={handleSubmit}
-            isLoading={updateLifeInsurance.isPending}
+            isLoading={updateHealthInsurance.isPending}
             errors={errors}
             resetForm={resetForm}
             onResetComplete={handleResetComplete}
@@ -176,18 +170,18 @@ const EditLifeInsuranceDialog = ({ open, onOpenChange, policy }) => {
             type="button"
             variant="outline"
             onClick={handleClose}
-            disabled={updateLifeInsurance.isPending}
+            disabled={updateHealthInsurance.isPending}
             className="border-white/30 text-gray-300 hover:text-white hover:bg-white/10"
           >
             Cancel
           </Button>
           <Button
             type="submit"
-            form="life-insurance-form"
-            disabled={updateLifeInsurance.isPending}
+            form="health-insurance-form"
+            disabled={updateHealthInsurance.isPending}
             className="bg-white/20 hover:bg-white/30 text-white border-white/30"
           >
-            {updateLifeInsurance.isPending ? (
+            {updateHealthInsurance.isPending ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Updating...
@@ -202,4 +196,4 @@ const EditLifeInsuranceDialog = ({ open, onOpenChange, policy }) => {
   );
 };
 
-export default EditLifeInsuranceDialog;
+export default EditHealthInsuranceDialog;

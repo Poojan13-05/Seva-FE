@@ -8,7 +8,8 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-  Shield
+  Shield,
+  Heart
 } from 'lucide-react';
 
 const sidebarItems = [
@@ -22,6 +23,12 @@ const sidebarItems = [
     title: "Life Insurance",
     icon: Shield,
     href: "/admin/life-insurance",
+    color: "text-white"
+  },
+  {
+    title: "Health Insurance",
+    icon: Heart,
+    href: "/admin/health-insurance",
     color: "text-white"
   }
 ];

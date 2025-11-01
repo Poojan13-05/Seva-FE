@@ -42,17 +42,27 @@ const LifeInsuranceFormStyled = ({
   selectedCustomer = null // Customer details for edit mode
 }) => {
   const { data: customersData } = useCustomersForDropdown();
-  const customers = customersData?.data?.customers || [];
-  
-  // If selectedCustomer is provided, always prioritize it and add to customers list
-  const allCustomers = selectedCustomer 
-    ? [selectedCustomer, ...customers.filter(c => c.value !== selectedCustomer.value)]
-    : customers;
+  const customersFromAPI = customersData?.data?.customers || [];
 
-  // Form state
+  // Merge selected customer with fetched customers to ensure it's in the dropdown
+  const customers = React.useMemo(() => {
+    if (!selectedCustomer) return customersFromAPI;
+
+    // Check if selected customer already exists in the list
+    const exists = customersFromAPI.some(c => c.value === selectedCustomer.value);
+
+    if (exists) {
+      return customersFromAPI;
+    }
+
+    // Add selected customer to the beginning of the list
+    return [selectedCustomer, ...customersFromAPI];
+  }, [customersFromAPI, selectedCustomer]);
+
+  // Form state - initialize with selectedCustomer if available
   const [formData, setFormData] = useState({
     clientDetails: {
-      customer: '',
+      customer: selectedCustomer?.value || initialData?.clientDetails?.customer?._id || initialData?.clientDetails?.customer || '',
       insuredName: ''
     },
     insuranceDetails: {
@@ -130,20 +140,22 @@ const LifeInsuranceFormStyled = ({
 
   
 
-  // Load initial data if editing
+  // Load initial data if editing - run once on mount
   useEffect(() => {
     if (initialData) {
-      // Handle customer ID - it could be a string ID or an object with _id
-      const customerData = initialData.clientDetails?.customer;
+      // Prioritize selectedCustomer value for customer field
       let customerId = '';
-      
-      if (typeof customerData === 'object' && customerData !== null) {
-        // Backend sends populated customer object with _id field
-        customerId = customerData._id || '';
-      } else if (typeof customerData === 'string') {
-        customerId = customerData;
+      if (selectedCustomer?.value) {
+        customerId = selectedCustomer.value;
+      } else {
+        const customerData = initialData.clientDetails?.customer;
+        if (typeof customerData === 'object' && customerData !== null) {
+          customerId = customerData._id || '';
+        } else if (typeof customerData === 'string') {
+          customerId = customerData;
+        }
       }
-      
+
       const newFormData = {
         clientDetails: {
           customer: customerId,
@@ -227,7 +239,8 @@ const LifeInsuranceFormStyled = ({
         setExistingDocuments(initialData.uploadDocuments);
       }
     }
-  }, [initialData]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run once on mount - selectedCustomer is already in initial state
 
 
   // Reset form when resetForm prop changes
@@ -455,12 +468,12 @@ const LifeInsuranceFormStyled = ({
                       <SelectValue placeholder="Select customer" />
                     </SelectTrigger>
                     <SelectContent className="bg-white/10 backdrop-blur-md border-white/20">
-                      {allCustomers.length === 0 ? (
+                      {customers.length === 0 ? (
                         <div className="px-2 py-1.5 text-sm text-gray-500">
                           Loading customers...
                         </div>
                       ) : (
-                        allCustomers.map(customer => (
+                        customers.map(customer => (
                           <SelectItem key={customer.value} value={customer.value} className="text-gray-300 hover:text-white">
                             {customer.label}
                           </SelectItem>
