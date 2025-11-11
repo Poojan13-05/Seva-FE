@@ -6,10 +6,12 @@ import AdminLayout from '@/layouts/AdminLayout';
 import CustomerManagement from '@/pages/Admin/CustomerManagement';
 import LifeInsuranceManagement from '@/pages/Admin/LifeInsuranceManagement';
 import HealthInsuranceManagement from '@/pages/Admin/HealthInsuranceManagement';
+import VehicleInsuranceManagement from '@/pages/Admin/VehicleInsuranceManagement';
 import AdminManagement from '@/pages/SuperAdmin/AdminManagement';
 import DeletedCustomers from '@/pages/SuperAdmin/DeletedCustomers';
 import DeletedLifeInsurancePolicies from '@/pages/SuperAdmin/DeletedLifeInsurancePolicies';
 import DeletedHealthInsurancePolicies from '@/pages/SuperAdmin/DeletedHealthInsurancePolicies';
+import DeletedVehicleInsurancePolicies from '@/pages/SuperAdmin/DeletedVehicleInsurancePolicies';
 
 
 const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
@@ -43,6 +45,7 @@ const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
         <Route path="deleted-customers" element={<DeletedCustomers/>} />
         <Route path="deleted-life-insurance" element={<DeletedLifeInsurancePolicies/>} />
         <Route path="deleted-health-insurance" element={<DeletedHealthInsurancePolicies/>} />
+        <Route path="deleted-vehicle-insurance" element={<DeletedVehicleInsurancePolicies/>} />
       </Route>
 
       {/* Protected Routes - Admin */}
@@ -60,6 +63,7 @@ const AppRoutes = ({ isLoggedIn, adminData, onLogout }) => {
         <Route path="customers" element={<CustomerManagement />} />
         <Route path="life-insurance" element={<LifeInsuranceManagement />} />
         <Route path="health-insurance" element={<HealthInsuranceManagement />} />
+        <Route path="vehicle-insurance" element={<VehicleInsuranceManagement />} />
       </Route>
 
       {/* Default redirect */}

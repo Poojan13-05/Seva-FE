@@ -315,5 +315,69 @@ export const superAdminService = {
       console.error('Error recovering health insurance policy:', error);
       throw error.response?.data || error;
     }
+  },
+
+  // Get deleted vehicle insurance policies
+  getDeletedVehicleInsurancePolicies: async (params = {}) => {
+    try {
+      const {
+        page = 1,
+        limit = 10,
+        search = '',
+        insuranceCompany = 'all',
+        policyType = 'all',
+        sortBy = 'updatedAt',
+        sortOrder = 'desc'
+      } = params;
+
+      const response = await api.get('/super-admin/vehicle-insurance/deleted', {
+        params: {
+          page,
+          limit,
+          search,
+          insuranceCompany,
+          policyType,
+          sortBy,
+          sortOrder
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching deleted vehicle insurance policies:', error);
+      throw error.response?.data || error;
+    }
+  },
+
+  // Get deleted vehicle insurance statistics
+  getDeletedVehicleInsuranceStats: async () => {
+    try {
+      const response = await api.get('/super-admin/vehicle-insurance/deleted/stats');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching deleted vehicle insurance stats:', error);
+      throw error.response?.data || error;
+    }
+  },
+
+  // Permanently delete vehicle insurance policy
+  permanentlyDeleteVehicleInsurancePolicy: async (policyId) => {
+    try {
+      const response = await api.delete(`/super-admin/vehicle-insurance/${policyId}/permanent`);
+      return response.data;
+    } catch (error) {
+      console.error('Error permanently deleting vehicle insurance policy:', error);
+      throw error.response?.data || error;
+    }
+  },
+
+  // Recover vehicle insurance policy
+  recoverVehicleInsurancePolicy: async (policyId) => {
+    try {
+      const response = await api.patch(`/super-admin/vehicle-insurance/${policyId}/recover`);
+      return response.data;
+    } catch (error) {
+      console.error('Error recovering vehicle insurance policy:', error);
+      throw error.response?.data || error;
+    }
   }
 };

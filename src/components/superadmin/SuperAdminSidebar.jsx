@@ -53,6 +53,12 @@ const sidebarItems = [
     href: "/super-admin/deleted-health-insurance",
     color: "text-white"
   },
+  {
+    title: "Deleted Vehicle Insurance",
+    icon: FileText,
+    href: "/super-admin/deleted-vehicle-insurance",
+    color: "text-white"
+  },
   // {
   //   title: "Users",
   //   icon: Users,

@@ -9,7 +9,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Shield,
-  Heart
+  Heart,
+  Car
 } from 'lucide-react';
 
 const sidebarItems = [
@@ -29,6 +30,12 @@ const sidebarItems = [
     title: "Health Insurance",
     icon: Heart,
     href: "/admin/health-insurance",
+    color: "text-white"
+  },
+  {
+    title: "Vehicle Insurance",
+    icon: Car,
+    href: "/admin/vehicle-insurance",
     color: "text-white"
   }
 ];
